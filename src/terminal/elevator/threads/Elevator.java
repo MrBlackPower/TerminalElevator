@@ -5,6 +5,7 @@
  */
 package terminal.elevator.threads;
 
+import java.util.ArrayList;
 import terminal.elevator.state.ElevatorState;
 
 /**
@@ -18,6 +19,7 @@ public class Elevator extends Thread {
     private int floor;
     private int currentWeight;
     private ElevatorState es;
+    private ArrayList<Person> onBoard;
     
     public Elevator(int id){
         this.id = id;
@@ -34,11 +36,24 @@ public class Elevator extends Thread {
         
     }
     
-    public void move(){
+    public void move() throws InterruptedException{
         if(es == ElevatorState.UPWARDS){
+            if(floor < 10){
+                floor += 1;
+                sleep(100);
+            } else {
+                es = ElevatorState.IDLE;
+            }
+                
             return;
         }
         if(es == ElevatorState.DOWNWARDS){
+            if(floor > 0){
+                floor -= 1;
+                sleep(100);
+            } else {
+                es = ElevatorState.IDLE;
+            }
             return;
         }
         System.out.println("Elevator bugged");

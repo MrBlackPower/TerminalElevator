@@ -9,6 +9,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import terminal.elevator.state.PersonState;
 import terminal.elevator.helper.MathHelper;
+import terminal.elevator.state.ElevatorState;
+import terminal.elevator.threads.messages.CallElevator;
 
 /**
  *
@@ -18,11 +20,11 @@ public class Person extends Thread{
     private int toFloor;
     private float trolleyWeight; 
     private PersonState ps;
+    private CallElevator cs;
     
-    
+    private final ElevatorState elevatorDirection;
     private final int id;
     private final float weight;
-    private final int trolleyQnt;
     private final int fromFloor;
     private final int idleTime;
     private final float MAXWEIGHT = 140;
@@ -39,17 +41,20 @@ public class Person extends Thread{
      * @param id
      */
     public Person(int id){
+        int trolleyQnt = MathHelper.randBetween(MAXTROLLEY,ZERO);
+        
         this.id = id;
         ps = PersonState.SLEEPING;
         fromFloor = MathHelper.randBetween(MAXFLOOR,ZERO);
         weight = MathHelper.randBetween(MAXWEIGHT,MINWEIGHT);
-        trolleyQnt = MathHelper.randBetween(MAXTROLLEY,ZERO);
         trolleyWeight = ZERO;
         idleTime = MathHelper.randBetween(MAXIDLETIME, ZERO);
         
         do
             toFloor = MathHelper.randBetween(MAXFLOOR,ZERO);
         while(toFloor == fromFloor);
+        
+        elevatorDirection = (toFloor > fromFloor? ElevatorState.UPWARDS : ElevatorState.DOWNWARDS);
                 
         for(int i = 0; i < trolleyQnt; i++)
             trolleyWeight += MathHelper.randBetween(MAXTROLLEYWEIGHT,MINTROLLEYWEIGHT);
@@ -57,13 +62,17 @@ public class Person extends Thread{
     
     @Override
     public void run(){
-        try {
-            sleep(idleTime);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(Person.class.getName()).log(Level.SEVERE, null, ex);
-        }
+//        try {
+//            sleep(idleTime);
+//        } catch (InterruptedException ex) {
+//            Logger.getLogger(Person.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+        callElevator();
         
-        System.out.println("Thread " + id + " awoke after " + idleTime + "ms");
+        
+//        System.out.println("Thread " + id + " awoke after " + idleTime + "ms");
+
+        
     }
 
     /**
@@ -74,17 +83,10 @@ public class Person extends Thread{
     }
 
     /**
-     * @return the trolleyNumber
-     */
-    public int getTrolleyQnt() {
-        return trolleyQnt;
-    }
-
-    /**
      * @return the trolleyWeight
      */
     public float getTrolleyWeight() {
-        return trolleyQnt;
+        return trolleyWeight;
     }
 
     /**
@@ -99,5 +101,32 @@ public class Person extends Thread{
      */
     public void setPs(PersonState ps) {
         this.ps = ps;
+    }
+
+    /**
+     * @return the toFloor
+     */
+    public int getToFloor() {
+        return toFloor;
+    }
+
+    /**
+     * @return the fromFloor
+     */
+    public int getFromFloor() {
+        return fromFloor;
+    }
+    
+    /**
+     * @return totalWeight
+     */
+    
+    public float totalWeight() {
+        return weight + trolleyWeight;
+    }
+    
+    public void callElevator(){
+        ps = PersonState.WAITING;
+        cs = new CallElevator(this);
     }
 }
