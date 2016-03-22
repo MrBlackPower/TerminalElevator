@@ -44,9 +44,17 @@ public class Elevator extends Thread {
     public void run(){
         while(es != ElevatorState.DEAD){
             if(es != ElevatorState.IDLE){
-                
+                try {
+                    idle();
+                } catch (InterruptedException | OutOfBounds ex) {
+                    Logger.getLogger(Elevator.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
+    }
+    
+    public void checkFloor(){
+        System.out.println("Unsupported method");
     }
     
     public void checkFloor(ArrayList<Person> persons){
@@ -57,33 +65,40 @@ public class Elevator extends Thread {
             
         }
         
-        //People going in and going in the same direction
-        for(Person p : persons){
-            if (p.getFloor() == floor) {
-                if (p.getDirection() == es) {
-                    try {
-                        getOn(p);
-                        persons.remove(p);
-                    } catch (WrongDirection ex) {
-                        Logger.getLogger(Elevator.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            }
-        }
-        
-        //People going in in the opposite direction
-        if (isEmpty()) {
+        if (es != ElevatorState.IDLE) {
+            //People going in and going in the same direction
             for (Person p : persons) {
-                //They only enter if the elevator is empty
                 if (p.getFloor() == floor) {
-                    try {
-                        getOn(p);
-                    } catch (WrongDirection ex) {
-                        Logger.getLogger(Elevator.class.getName()).log(Level.SEVERE, null, ex);
+                    if (p.getDirection() == es) {
+                        try {
+                            getOn(p);
+                            persons.remove(p);
+                        } catch (WrongDirection ex) {
+                            Logger.getLogger(Elevator.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
-                    
                 }
             }
+
+            //Checks if can change direction
+            boolean changeDirection = (es == ElevatorState.UPWARDS ? hasAboveActions() : hasBelowActions());
+
+            //People going in in the opposite direction get in if the elevator
+            //is empty and it`s possible to change the direction
+            if (isEmpty() && changeDirection) {
+                for (Person p : persons) {
+                    //They only enter if the elevator is empty
+                    if (p.getFloor() == floor) {
+                        try {
+                            getOn(p);
+                        } catch (WrongDirection ex) {
+                            Logger.getLogger(Elevator.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        
+                    }
+                }
+            }
+        } else {
         }
     }
     
@@ -95,7 +110,7 @@ public class Elevator extends Thread {
         }
         
         //Remove Call
-        removeCalls();
+        removeCalls(p.getCs());
         
         //Add Order
         orders.add(new OrderElevator(p));
@@ -120,17 +135,30 @@ public class Elevator extends Thread {
         if(!isInBounds())
             throw new OutOfBounds("Elevator out of terminal bounds");
         
-        if(es == ElevatorState.UPWARDS || es == ElevatorState.DOWNWARDS){
-            changeFloor();
+        if(es == ElevatorState.UPWARDS){
+            if(!isOnTopFloor()){
+                floor += 1;
+                sleep(100);
+            } else {
+                es = ElevatorState.IDLE;
+            }
             return;
         }
         
-        if(es == ElevatorState.IDLE){
-            idle();
+        if(es == ElevatorState.DOWNWARDS){
+            if(!isOnGroundFloor()){
+                floor -= 1;
+                sleep(100);
+            } else {
+                es = ElevatorState.IDLE;
+            }
             return;
         }
-          
-        System.out.println("Elevator bugged");
+        
+        for(Person p : onBoard){
+            p.setFloor(floor);
+        }
+        
     }
     
     public boolean isOnGroundFloor(){
@@ -149,52 +177,51 @@ public class Elevator extends Thread {
         return onBoard.isEmpty();
     }
     
-    private void changeFloor() throws InterruptedException, OutOfBounds{
-        if(es != ElevatorState.DOWNWARDS && es!= ElevatorState.UPWARDS)
-            return;
-        
-        //Move elevator upwards
-        if(es == ElevatorState.UPWARDS){
-            if(!isOnTopFloor()){
-                floor += 1;
-                sleep(100);
-            } else {
-                es = ElevatorState.IDLE;
-                move();
-            }
-            return;
-        }
-        
-        //Move elevator downwards
-        if(es == ElevatorState.DOWNWARDS){
-            //In case there`s a call above and the elevator is empty
-            if(onBoard.isEmpty()){
+    
+    private void idle() throws InterruptedException, OutOfBounds{
+        checkFloor();
+        if(isOnGroundFloor()){
+            checkFloor();
+            if(hasAboveActions())
                 es = ElevatorState.UPWARDS;
-                move();
+        } else {
+            if(!hasActions()){
+                es = ElevatorState.DOWNWARDS;
             }
-            //If it`s not on ground floor
-            if(!isOnGroundFloor()){
-                floor -= 1;
-                sleep(100);
-            } else {
-                es = ElevatorState.IDLE;
-                move();
-            }
-            return;
-        }
-        
-        for(Person p : onBoard){
-            p.setFloor(floor);
         }
     }
     
-    private void idle() throws InterruptedException, OutOfBounds{
-        //If it`s not on ground floor
-        if(!isOnGroundFloor()){
-            if(!hasActions()){
-                es = ElevatorState.DOWNWARDS;
+    private void upwards() throws OutOfBounds, InterruptedException{
+        checkFloor();
+        if(!isOnTopFloor()){
+            if(hasAboveActions())
                 move();
+            else
+                es = ElevatorState.DOWNWARDS;
+        } else {
+            if(hasAboveActions())
+                throw new OutOfBounds("Has actions beyond top floor");
+            
+            es = ElevatorState.DOWNWARDS;
+        }
+    }
+    
+    private void downwards() throws InterruptedException, OutOfBounds{
+        checkFloor();
+        if(!isOnGroundFloor()){
+            if(!hasBelowActions() && hasAboveActions())
+                es = ElevatorState.UPWARDS;
+            else
+                move();
+        } else {
+            if(hasBelowActions()){
+                throw new OutOfBounds("Has actions below ground floor");
             }
+            if(hasAboveActions()){
+                es = ElevatorState.UPWARDS;
+                return;
+            }
+            es = ElevatorState.IDLE;
         }
     }
     
@@ -209,7 +236,7 @@ public class Elevator extends Thread {
         return !orders.isEmpty();
     }
     
-    private boolean aboveOrders(){
+    private boolean hasAboveOrders(){
         for(OrderElevator o : orders){
             if(o.getToFloor() > floor)
                 return true;
@@ -217,7 +244,7 @@ public class Elevator extends Thread {
         return false;
     }
     
-    private boolean belowOrders(){
+    private boolean hasBelowOrders(){
         for(OrderElevator o : orders){
             if(o.getToFloor() < floor)
                 return true;
@@ -225,18 +252,15 @@ public class Elevator extends Thread {
         return false;
     }
     
-    private void removeCalls(){
-        for(CallElevator c : calls){
-            if(c.getFromFloor() == floor)
-                orders.remove(c);
-        }
+    private void removeCalls(CallElevator c){
+        calls.remove(c);
     }
     
     private boolean hasCalls(){
         return !calls.isEmpty();
     }
     
-    private boolean aboveCalls(){
+    private boolean hasAboveCalls(){
         for(CallElevator c : calls){
             if(c.getFromFloor() > floor)
                 return true;
@@ -244,7 +268,7 @@ public class Elevator extends Thread {
         return false;
     }
     
-    private boolean belowCalls(){
+    private boolean hasBelowCalls(){
         for(CallElevator c : calls){
             if(c.getFromFloor() < floor)
                 return true;
@@ -254,5 +278,13 @@ public class Elevator extends Thread {
     
     private boolean hasActions(){
         return hasCalls() || hasOrders();
+    }
+    
+    private boolean hasAboveActions(){
+        return hasAboveCalls() || hasAboveOrders();
+    }
+    
+    private boolean hasBelowActions(){
+        return hasBelowCalls() || hasBelowOrders();
     }
 }
