@@ -6,7 +6,7 @@
 package terminal.elevator;
 
 import java.util.ArrayList;
-import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import terminal.elevator.threads.*;
 import terminal.elevator.threads.messages.CallElevator;
 
@@ -17,7 +17,7 @@ import terminal.elevator.threads.messages.CallElevator;
 public class ElevatorManager {
     public ArrayList<Elevator> elevators;
     public ArrayList<Person> persons;
-    public SynchronousQueue<CallElevator> callList;
+    public LinkedBlockingQueue<CallElevator> callList;
     
     /**
      * 
@@ -27,13 +27,13 @@ public class ElevatorManager {
     public ElevatorManager(ArrayList<Person> persons, ArrayList<Elevator> elevators){
         this.elevators = elevators;
         this.persons   = persons;
-        this.callList      = new SynchronousQueue();
+        this.callList  = new LinkedBlockingQueue();
     }
     
     public ElevatorManager (ArrayList<Elevator> elevators) {
         this.elevators = elevators;
         this.persons   = new ArrayList();
-        this.callList      = new SynchronousQueue();
+        this.callList      = new LinkedBlockingQueue();
     }
     
     /**
@@ -44,7 +44,7 @@ public class ElevatorManager {
         this.elevators = new ArrayList();
         elevators.add(new Elevator(1));
         this.persons = new ArrayList();
-        this.callList    = new SynchronousQueue();
+        this.callList    = new LinkedBlockingQueue();
     }
     
     public void addPerson (Person p) {
@@ -60,7 +60,6 @@ public class ElevatorManager {
             for (Person p : this.persons)
                 p.start();
             callList.addAll(this.persons.get(0).getCallList());
-            callList.
         }
     }
 }
