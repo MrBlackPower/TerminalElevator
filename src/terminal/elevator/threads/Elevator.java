@@ -10,38 +10,42 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import terminal.elevator.state.ElevatorState;
 import terminal.elevator.errors.*;
+import terminal.elevator.threads.messages.CallElevator;
+import terminal.elevator.threads.messages.OrderElevator;
 
 /**
  *
  * @author User
  */
 public class Elevator extends Thread {
-    private final int id;
+    private final int ID;
     private final int MAXWEIGHT = 600;
-    private final int lowestfloor = 0;
+    private final int GROUNDFLOOR = 0;
+    private final int TOPFLOOR = 10;
     
     private int floor;
-    private int highestFloor;
     private int currentWeight;
     private ElevatorState es;
     private ArrayList<Person> onBoard;
+    private ArrayList<CallElevator> calls;
+    private ArrayList<OrderElevator> orders;
     
-    public Elevator(int id){
-        this.id = id;
+    public Elevator(int ID){
+        this.ID = ID;
         floor = 0;
         currentWeight = 0;
-        highestFloor = 0;
         es = ElevatorState.IDLE;
+        onBoard = new ArrayList<>();
+        calls = new ArrayList<>();
+        orders = new ArrayList<>();
     }
     
     @Override
     public void run(){
-        while(true){
-            if(es != ElevatorState.IDLE && es != ElevatorState.DEAD){
+        while(es != ElevatorState.DEAD){
+            if(es != ElevatorState.IDLE){
                 
             }
-            if(es == ElevatorState.DEAD)
-                break;
         }
     }
     
@@ -53,43 +57,48 @@ public class Elevator extends Thread {
             
         }
         
-        //People coming in
+        //People going in and going in the same direction
         for(Person p : persons){
-            if(p.getElevatorDirection() == es){
-                try {
-                    getOn(p);
-                } catch (WrongDirection ex) {
-                    Logger.getLogger(Elevator.class.getName()).log(Level.SEVERE, null, ex);
+            if (p.getFloor() == floor) {
+                if (p.getDirection() == es) {
+                    try {
+                        getOn(p);
+                        persons.remove(p);
+                    } catch (WrongDirection ex) {
+                        Logger.getLogger(Elevator.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
+        
+        //People going in in the opposite direction
+        if (isEmpty()) {
+            for (Person p : persons) {
+                //They only enter if the elevator is empty
+                if (p.getFloor() == floor) {
+                    try {
+                        getOn(p);
+                    } catch (WrongDirection ex) {
+                        Logger.getLogger(Elevator.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    
                 }
             }
         }
     }
     
     public void getOn(Person p) throws WrongDirection{
-        if(p.getElevatorDirection() != es)
-            throw new WrongDirection("Wrong Direction passenger trying to board");
-        
+        //Checks weight
         if(currentWeight + p.totalWeight() >= MAXWEIGHT){
             System.out.println("Overweight detected, person will not board.");
             return;
         }
         
-        if(null != es)switch (es) {
-            case DOWNWARDS:
-                if(floor > p.getToFloor())
-                    throw new WrongDirection("Passenger Confused");
-                
-                break;
-            case UPWARDS:
-                if(floor < p.getToFloor())
-                    throw new WrongDirection("Passenger Confused");
-                
-                highestFloor = p.getToFloor();
-                
-                break;
-            default:
-                throw new WrongDirection("Elevator Confused");
-        }
+        //Remove Call
+        removeCalls();
+        
+        //Add Order
+        orders.add(new OrderElevator(p));
         
         p.getOn(this);
         currentWeight += p.totalWeight();
@@ -98,26 +107,73 @@ public class Elevator extends Thread {
     
     public void getOut(Person p){
         currentWeight -= p.totalWeight();
+        
         p.getOut();
         if(onBoard.contains(p))
             onBoard.remove(p);
+        
+        //Remove Order
+        removeOrders();
     }
     
-    public void move() throws InterruptedException{
+    public void move() throws InterruptedException, OutOfBounds{
+        if(!isInBounds())
+            throw new OutOfBounds("Elevator out of terminal bounds");
+        
+        if(es == ElevatorState.UPWARDS || es == ElevatorState.DOWNWARDS){
+            changeFloor();
+            return;
+        }
+        
+        if(es == ElevatorState.IDLE){
+            idle();
+            return;
+        }
+          
+        System.out.println("Elevator bugged");
+    }
+    
+    public boolean isOnGroundFloor(){
+        return floor == GROUNDFLOOR;
+    }
+    
+    public boolean isOnTopFloor(){
+        return floor == TOPFLOOR;
+    }
+    
+    public boolean isInBounds(){
+        return (floor >= GROUNDFLOOR && floor <= TOPFLOOR);
+    }
+    
+    public boolean isEmpty(){
+        return onBoard.isEmpty();
+    }
+    
+    private void changeFloor() throws InterruptedException, OutOfBounds{
+        if(es != ElevatorState.DOWNWARDS && es!= ElevatorState.UPWARDS)
+            return;
+        
+        //Move elevator upwards
         if(es == ElevatorState.UPWARDS){
-            if(floor < 10 && floor < highestFloor){
+            if(!isOnTopFloor()){
                 floor += 1;
                 sleep(100);
             } else {
-                highestFloor = 0;
-                es = ElevatorState.DOWNWARDS;
+                es = ElevatorState.IDLE;
                 move();
             }
             return;
         }
         
+        //Move elevator downwards
         if(es == ElevatorState.DOWNWARDS){
-            if(floor > 0 && floor > lowestfloor){
+            //In case there`s a call above and the elevator is empty
+            if(onBoard.isEmpty()){
+                es = ElevatorState.UPWARDS;
+                move();
+            }
+            //If it`s not on ground floor
+            if(!isOnGroundFloor()){
                 floor -= 1;
                 sleep(100);
             } else {
@@ -127,26 +183,76 @@ public class Elevator extends Thread {
             return;
         }
         
-        if(es == ElevatorState.IDLE){
-            if(floor > 0){
-                if(floor > lowestfloor){
-                    floor -= 1;
-                    sleep(100);
-                } else {
-                    es = ElevatorState.IDLE;
-                    move();
-                }            
-            }
-            return;
+        for(Person p : onBoard){
+            p.setFloor(floor);
         }
-          
-        System.out.println("Elevator bugged");
     }
     
-    public boolean isOnGroundFloor(){
-        if(floor == 0)
-            return true;
-                
+    private void idle() throws InterruptedException, OutOfBounds{
+        //If it`s not on ground floor
+        if(!isOnGroundFloor()){
+            if(!hasActions()){
+                es = ElevatorState.DOWNWARDS;
+                move();
+            }
+        }
+    }
+    
+    private void removeOrders(){
+        for(OrderElevator o : orders){
+            if(o.getToFloor() == floor)
+                orders.remove(o);
+        }
+    }
+    
+    private boolean hasOrders(){
+        return !orders.isEmpty();
+    }
+    
+    private boolean aboveOrders(){
+        for(OrderElevator o : orders){
+            if(o.getToFloor() > floor)
+                return true;
+        }
         return false;
+    }
+    
+    private boolean belowOrders(){
+        for(OrderElevator o : orders){
+            if(o.getToFloor() < floor)
+                return true;
+        }
+        return false;
+    }
+    
+    private void removeCalls(){
+        for(CallElevator c : calls){
+            if(c.getFromFloor() == floor)
+                orders.remove(c);
+        }
+    }
+    
+    private boolean hasCalls(){
+        return !calls.isEmpty();
+    }
+    
+    private boolean aboveCalls(){
+        for(CallElevator c : calls){
+            if(c.getFromFloor() > floor)
+                return true;
+        }
+        return false;
+    }
+    
+    private boolean belowCalls(){
+        for(CallElevator c : calls){
+            if(c.getFromFloor() < floor)
+                return true;
+        }
+        return false;
+    }
+    
+    private boolean hasActions(){
+        return hasCalls() || hasOrders();
     }
 }

@@ -13,18 +13,16 @@ import terminal.elevator.threads.Person;
  *
  * @author User
  */
-public class CallElevator {
+public class OrderElevator {
     private final int id;
-    private final int fromFloor;
+    private final int toFloor;
     private final CallState cs;
-    private final ElevatorState direction;
     
     static int callNumber = 1;
     
-    public CallElevator(Person p){
+    public OrderElevator(Person p){
         this.id = callNumber;
-        fromFloor = p.getFromFloor();
-        direction = p.getDirection();
+        toFloor = p.getToFloor();
         cs = CallState.WAITING;
         callNumber += 1;
     }
@@ -37,16 +35,9 @@ public class CallElevator {
     }
 
     /**
-     * @return the fromFloor
+     * @return the toFloor
      */
-    public int getFromFloor() {
-        return fromFloor;
-    }
-
-    /**
-     * @return the direction
-     */
-    public ElevatorState getDirection() {
-        return direction;
+    public int getToFloor() {
+        return toFloor;
     }
 }

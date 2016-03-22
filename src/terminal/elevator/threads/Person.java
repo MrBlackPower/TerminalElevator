@@ -19,13 +19,14 @@ import terminal.elevator.threads.messages.CallElevator;
  */
 public class Person extends Thread{
     private int toFloor;
+    private int floor;
     private float trolleyWeight; 
     private PersonState ps;
     private CallElevator cs;
     private Elevator e;
     private SynchronousQueue<CallElevator> line;
     
-    private final ElevatorState elevatorDirection;
+    private final ElevatorState direction;
     private final int id;
     private final float weight;
     private final int fromFloor;
@@ -49,6 +50,7 @@ public class Person extends Thread{
         this.id = id;
         ps = PersonState.SLEEPING;
         fromFloor = MathHelper.randBetween(MAXFLOOR,ZERO);
+        floor = fromFloor;
         weight = MathHelper.randBetween(MAXWEIGHT,MINWEIGHT);
         trolleyWeight = ZERO;
         idleTime = MathHelper.randBetween(MAXIDLETIME, ZERO);
@@ -57,7 +59,7 @@ public class Person extends Thread{
             toFloor = MathHelper.randBetween(MAXFLOOR,ZERO);
         while(toFloor == fromFloor);
         
-        elevatorDirection = (toFloor > fromFloor? ElevatorState.UPWARDS : ElevatorState.DOWNWARDS);
+        direction = (toFloor > fromFloor? ElevatorState.UPWARDS : ElevatorState.DOWNWARDS);
                 
         for(int i = 0; i < trolleyQnt; i++)
             trolleyWeight += MathHelper.randBetween(MAXTROLLEYWEIGHT,MINTROLLEYWEIGHT);
@@ -88,7 +90,9 @@ public class Person extends Thread{
     }
     
     public void getOut(){
-        ps = PersonState.FINISHED;
+        if (floor == toFloor) {
+            ps = PersonState.FINISHED;
+        }
     }
 
     /**
@@ -159,9 +163,23 @@ public class Person extends Thread{
     }
 
     /**
-     * @return the elevatorDirection
+     * @return the direction
      */
-    public ElevatorState getElevatorDirection() {
-        return elevatorDirection;
+    public ElevatorState getDirection() {
+        return direction;
+    }
+
+    /**
+     * @return the floor
+     */
+    public int getFloor() {
+        return floor;
+    }
+
+    /**
+     * @param floor the floor to set
+     */
+    public void setFloor(int floor) {
+        this.floor = floor;
     }
 }
