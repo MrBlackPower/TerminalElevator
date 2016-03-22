@@ -5,6 +5,7 @@
  */
 package terminal.elevator.threads;
 
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.SynchronousQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,7 +25,7 @@ public class Person extends Thread{
     private PersonState ps;
     private CallElevator cs;
     private Elevator e;
-    private SynchronousQueue<CallElevator> line;
+    private BlockingQueue<CallElevator> line;
     
     private final ElevatorState direction;
     private final int id;
@@ -44,9 +45,11 @@ public class Person extends Thread{
      * Person Constructor 
      * @param id
      */
-    public Person(int id, SynchronousQueue<CallElevator> line){
+    public Person(int id, BlockingQueue<CallElevator> line){
         int trolleyQnt = MathHelper.randBetween(MAXTROLLEY,ZERO);
         
+        this.line = line;
+        line.
         this.id = id;
         ps = PersonState.SLEEPING;
         fromFloor = MathHelper.randBetween(MAXFLOOR,ZERO);
@@ -181,5 +184,9 @@ public class Person extends Thread{
      */
     public void setFloor(int floor) {
         this.floor = floor;
+    }
+    
+    public SynchronousQueue<CallElevator> getCallList () {
+        return line;
     }
 }

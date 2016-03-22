@@ -6,7 +6,9 @@
 package terminal.elevator;
 
 import java.util.ArrayList;
+import java.util.concurrent.SynchronousQueue;
 import terminal.elevator.threads.*;
+import terminal.elevator.threads.messages.CallElevator;
 
 /**
  *
@@ -15,10 +17,50 @@ import terminal.elevator.threads.*;
 public class ElevatorManager {
     public ArrayList<Elevator> elevators;
     public ArrayList<Person> persons;
+    public SynchronousQueue<CallElevator> callList;
     
-    public ElevatorManager(){
-        elevators = new ArrayList<>();
-        persons = new ArrayList<>();
-        
+    /**
+     * 
+     * @param persons
+     * @param elevators 
+     */
+    public ElevatorManager(ArrayList<Person> persons, ArrayList<Elevator> elevators){
+        this.elevators = elevators;
+        this.persons   = persons;
+        this.callList      = new SynchronousQueue();
+    }
+    
+    public ElevatorManager (ArrayList<Elevator> elevators) {
+        this.elevators = elevators;
+        this.persons   = new ArrayList();
+        this.callList      = new SynchronousQueue();
+    }
+    
+    /**
+     * When called with no arguments, the default behavior is to consider
+     * a single elevator system.
+     */
+    public ElevatorManager () {
+        this.elevators = new ArrayList();
+        elevators.add(new Elevator(1));
+        this.persons = new ArrayList();
+        this.callList    = new SynchronousQueue();
+    }
+    
+    public void addPerson (Person p) {
+        this.persons.add(p);
+    }
+    
+    public void addPerson (ArrayList<Person> p) {
+        this.persons.addAll(p);
+    }
+    
+    public void start() {
+        if (!this.persons.isEmpty()) {
+            for (Person p : this.persons)
+                p.start();
+            callList.addAll(this.persons.get(0).getCallList());
+            callList.
+        }
     }
 }
