@@ -142,4 +142,11 @@ public class Elevator extends Thread {
           
         System.out.println("Elevator bugged");
     }
+    
+    public boolean isOnGroundFloor(){
+        if(floor == 0)
+            return true;
+                
+        return false;
+    }
 }

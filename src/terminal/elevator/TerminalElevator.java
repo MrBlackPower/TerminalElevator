@@ -19,15 +19,15 @@ public class TerminalElevator {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        ArrayList<Person> persons = new ArrayList<>();
-        
-        for(int i = 1; i <= 20; i++){
-            persons.add(new Person(i));
-        }
-        
-        for(Person p : persons)
-            p.start();
-        
-        System.out.println("I`ve finished");
+//        ArrayList<Person> persons = new ArrayList<>();
+//        
+//        for(int i = 1; i <= 20; i++){
+//            persons.add(new Person(i));
+//        }
+//        
+//        for(Person p : persons)
+//            p.start();
+//        
+//        System.out.println("I`ve finished");
     }
 }
