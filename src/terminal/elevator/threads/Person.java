@@ -5,6 +5,7 @@
  */
 package terminal.elevator.threads;
 
+import java.util.concurrent.SynchronousQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import terminal.elevator.state.PersonState;
@@ -21,6 +22,8 @@ public class Person extends Thread{
     private float trolleyWeight; 
     private PersonState ps;
     private CallElevator cs;
+    private Elevator e;
+    private SynchronousQueue<CallElevator> line;
     
     private final ElevatorState elevatorDirection;
     private final int id;
@@ -40,7 +43,7 @@ public class Person extends Thread{
      * Person Constructor 
      * @param id
      */
-    public Person(int id){
+    public Person(int id, SynchronousQueue<CallElevator> line){
         int trolleyQnt = MathHelper.randBetween(MAXTROLLEY,ZERO);
         
         this.id = id;
@@ -62,17 +65,30 @@ public class Person extends Thread{
     
     @Override
     public void run(){
-//        try {
-//            sleep(idleTime);
-//        } catch (InterruptedException ex) {
-//            Logger.getLogger(Person.class.getName()).log(Level.SEVERE, null, ex);
-//        }
+        try {
+            sleep(idleTime);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Person.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        System.out.println("Thread " + id + " awoke after " + idleTime + "ms");
+        
+        
         callElevator();
         
-        
-//        System.out.println("Thread " + id + " awoke after " + idleTime + "ms");
 
-        
+        while(!(ps == PersonState.FINISHED)){
+            
+        }
+    }
+    
+    public void getOn(Elevator e){
+        this.e = e;
+        ps = PersonState.ONELEVATOR;
+    }
+    
+    public void getOut(){
+        ps = PersonState.FINISHED;
     }
 
     /**
@@ -128,5 +144,24 @@ public class Person extends Thread{
     public void callElevator(){
         ps = PersonState.WAITING;
         cs = new CallElevator(this);
+        try {
+            line.put(cs);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Person.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
+     * @return the cs
+     */
+    public CallElevator getCs() {
+        return cs;
+    }
+
+    /**
+     * @return the elevatorDirection
+     */
+    public ElevatorState getElevatorDirection() {
+        return elevatorDirection;
     }
 }

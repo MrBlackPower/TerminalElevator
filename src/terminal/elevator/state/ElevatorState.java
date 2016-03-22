@@ -10,5 +10,5 @@ package terminal.elevator.state;
  * @author User
  */
 public enum ElevatorState {
-    UPWARDS,DOWNWARDS,IDLE,STOPPED;
+    UPWARDS,DOWNWARDS,IDLE,STOPPED,DEAD;
 }
