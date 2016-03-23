@@ -155,7 +155,13 @@ public class ElevatorManager extends Thread{
         return dist;
     }
 
-    private void getElevator(CallElevator ce) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private Elevator getElevator(CallElevator ce) {
+        Elevator assignedElevator = elevators.get(0);
+        for (Elevator e : elevators) {
+            if (distance(e, ce) < distance(assignedElevator, ce)) {
+                assignedElevator = e;
+            }
+        }
+        return assignedElevator;
     }
 }
