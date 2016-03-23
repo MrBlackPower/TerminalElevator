@@ -78,8 +78,8 @@ public class Elevator extends Thread {
                         try {
                             getOn(p);
                             persons.remove(p);
-                        } catch (WrongDirection ex) {
-                            Logger.getLogger(Elevator.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (WrongDirection | ThreadStillAlive ex) {
+                            System.out.println(ex.getMessage());
                         }
                     }
                 }
@@ -96,8 +96,8 @@ public class Elevator extends Thread {
                     if (p.getFloor() == floor) {
                         try {
                             getOn(p);
-                        } catch (WrongDirection ex) {
-                            Logger.getLogger(Elevator.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (WrongDirection | ThreadStillAlive ex) {
+                            System.out.println(ex.getMessage());
                         }
                         
                     }
@@ -107,7 +107,7 @@ public class Elevator extends Thread {
         }
     }
     
-    public void getOn(Person p) throws WrongDirection{
+    public void getOn(Person p) throws WrongDirection, ThreadStillAlive{
         //Checks weight
         if(currentWeight + p.totalWeight() >= MAXWEIGHT){
             System.out.println("Overweight detected, person will not board.");
@@ -120,8 +120,10 @@ public class Elevator extends Thread {
         //Add Order
         orders.add(new OrderElevator(p));
         
-        p.e = this;
-        p.ps = PersonState.ONELEVATOR;
+        if(p.isAlive())
+            throw new ThreadStillAlive("Person still alive");
+            
+        p.getOn(this);
         currentWeight += p.totalWeight();
         onBoard.add(p);
     }
@@ -129,8 +131,7 @@ public class Elevator extends Thread {
     public void getOut(Person p){
         currentWeight -= p.totalWeight();
         
-        p.e = null;
-        p.ps = PersonState.FINISHED;
+        p.getOff();
         if(onBoard.contains(p))
             onBoard.remove(p);
         

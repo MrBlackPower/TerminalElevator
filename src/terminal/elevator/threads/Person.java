@@ -21,9 +21,8 @@ import terminal.elevator.threads.messages.CallElevator;
 public class Person extends Thread{
     private static int count = 0;
     
-    protected PersonState ps;
-    protected Elevator e;
-    
+    private PersonState ps;
+    private Elevator e;
     private int toFloor;
     private int floor;
     private float trolleyWeight; 
@@ -82,18 +81,9 @@ public class Person extends Thread{
         
         System.out.println("Thread " + ID + " awoke after " + IDLETIME + "ms in floor " + FROMFLOOR);
         
-        while(!isDead()){
-            if(ps == PersonState.SLEEPING){
-                callElevator();
-                ps = PersonState.WAITING;
-            }
-            
-        }
-        
-        try {
-            checkCompletion();
-        } catch (FalseStatement ex) {
-            System.out.println(ex.getMessage());
+        if(ps == PersonState.SLEEPING){
+            callElevator();
+            ps = PersonState.WAITING;
         }
         
         System.out.println("Thread " + ID + " finished.");
@@ -195,13 +185,19 @@ public class Person extends Thread{
         return LINE;
     }
     
-    public boolean isDead(){
-        return ps == PersonState.FINISHED;
-    }
-    
     public void checkCompletion() throws FalseStatement{
         if(floor != toFloor){
             throw new FalseStatement("Person " + ID + " is not really finished.");
         }
+    }
+    
+    public void getOn(Elevator e){
+        this.e = e;
+        ps = PersonState.ONELEVATOR;
+    }
+    
+    public void getOff(){
+        e = null;
+        ps = PersonState.FINISHED;
     }
 }
