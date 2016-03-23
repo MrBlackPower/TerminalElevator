@@ -8,6 +8,7 @@ package terminal.elevator.threads;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import terminal.elevator.errors.FalseStatement;
 import terminal.elevator.state.PersonState;
 import terminal.elevator.helper.MathHelper;
 import terminal.elevator.state.ElevatorState;
@@ -20,19 +21,19 @@ import terminal.elevator.threads.messages.CallElevator;
 public class Person extends Thread{
     private static int count = 0;
     
+    protected PersonState ps;
+    protected Elevator e;
+    
     private int toFloor;
     private int floor;
     private float trolleyWeight; 
-    private PersonState ps;
     private CallElevator cs;
-    private Elevator e;
-    private final LinkedBlockingQueue<CallElevator> line;
-    
-    private final ElevatorState direction;
-    private final int id;
-    private final float weight;
-    private final int fromFloor;
-    private final int idleTime;
+    private final LinkedBlockingQueue<CallElevator> LINE;
+    private final ElevatorState DIRECTION;
+    private final int ID;
+    private final float WEIGHT;
+    private final int FROMFLOOR;
+    private final int IDLETIME;
     private final float MAXWEIGHT = 140;
     private final float MINWEIGHT = 50;
     private final int MAXFLOOR = 10;
@@ -44,26 +45,26 @@ public class Person extends Thread{
     
     /**
      * Person Constructor 
-     * @param id
+     * @param line
      */
     public Person(LinkedBlockingQueue<CallElevator> line){
         count ++;
-        id = count;
+        ID = count;
         
         int trolleyQnt = MathHelper.randBetween(MAXTROLLEY,ZERO);
-        this.line = line;
+        this.LINE = line;
         ps = PersonState.SLEEPING;
-        fromFloor = MathHelper.randBetween(MAXFLOOR,ZERO);
-        floor = fromFloor;
-        weight = MathHelper.randBetween(MAXWEIGHT,MINWEIGHT);
+        FROMFLOOR = MathHelper.randBetween(MAXFLOOR,ZERO);
+        floor = FROMFLOOR;
+        WEIGHT = MathHelper.randBetween(MAXWEIGHT,MINWEIGHT);
         trolleyWeight = ZERO;
-        idleTime = MathHelper.randBetween(MAXIDLETIME, ZERO);
+        IDLETIME = MathHelper.randBetween(MAXIDLETIME, ZERO);
         
         do
             toFloor = MathHelper.randBetween(MAXFLOOR,ZERO);
-        while(toFloor == fromFloor);
+        while(toFloor == FROMFLOOR);
         
-        direction = (toFloor > fromFloor? ElevatorState.UPWARDS : ElevatorState.DOWNWARDS);
+        DIRECTION = (toFloor > FROMFLOOR? ElevatorState.UPWARDS : ElevatorState.DOWNWARDS);
                 
         for(int i = 0; i < trolleyQnt; i++)
             trolleyWeight += MathHelper.randBetween(MAXTROLLEYWEIGHT,MINTROLLEYWEIGHT);
@@ -72,34 +73,37 @@ public class Person extends Thread{
     @Override
     public void run(){
         try {
-            sleep(idleTime);
+            sleep(IDLETIME);
         } catch (InterruptedException ex) {
             Logger.getLogger(Person.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        System.out.println("Thread " + id + " awoke after " + idleTime + "ms in floor " + fromFloor);
         
         
-        callElevator();
-        System.out.println("Thread " + id + " finished.");
-    }
-    
-    public void getOn(Elevator e){
-        this.e = e;
-        ps = PersonState.ONELEVATOR;
-    }
-    
-    public void getOut(){
-        if (floor == toFloor) {
-            ps = PersonState.FINISHED;
+        System.out.println("Thread " + ID + " awoke after " + IDLETIME + "ms in floor " + FROMFLOOR);
+        
+        while(!isDead()){
+            if(ps == PersonState.SLEEPING){
+                callElevator();
+                ps = PersonState.WAITING;
+            }
+            
         }
+        
+        try {
+            checkCompletion();
+        } catch (FalseStatement ex) {
+            System.out.println(ex.getMessage());
+        }
+        
+        System.out.println("Thread " + ID + " finished.");
     }
 
     /**
-     * @return the weight
+     * @return the WEIGHT
      */
     public float getWeight() {
-        return weight;
+        return WEIGHT;
     }
 
     /**
@@ -131,10 +135,10 @@ public class Person extends Thread{
     }
 
     /**
-     * @return the fromFloor
+     * @return the FROMFLOOR
      */
     public int getFromFloor() {
-        return fromFloor;
+        return FROMFLOOR;
     }
     
     /**
@@ -142,14 +146,14 @@ public class Person extends Thread{
      */
     
     public float totalWeight() {
-        return weight + trolleyWeight;
+        return WEIGHT + trolleyWeight;
     }
     
     public void callElevator(){
         ps = PersonState.WAITING;
         cs = new CallElevator(this);
         try {
-            line.put(cs);
+            LINE.put(cs);
         } catch (InterruptedException ex) {
             Logger.getLogger(Person.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -163,10 +167,10 @@ public class Person extends Thread{
     }
 
     /**
-     * @return the direction
+     * @return the DIRECTION
      */
     public ElevatorState getDirection() {
-        return direction;
+        return DIRECTION;
     }
 
     /**
@@ -188,6 +192,16 @@ public class Person extends Thread{
      * @return
      */
     public LinkedBlockingQueue<CallElevator> getCallList () {
-        return line;
+        return LINE;
+    }
+    
+    public boolean isDead(){
+        return ps == PersonState.FINISHED;
+    }
+    
+    public void checkCompletion() throws FalseStatement{
+        if(floor != toFloor){
+            throw new FalseStatement("Person " + ID + " is not really finished.");
+        }
     }
 }

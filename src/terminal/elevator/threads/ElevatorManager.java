@@ -91,7 +91,7 @@ public class ElevatorManager extends Thread{
                 while(!newCalls.isEmpty()){
                     //Atributes a elevator to it
                     CallElevator nc = newCalls.poll();
-                    System.out.println("Call in  Floor" + nc.getFromFloor());
+                    System.out.println("Call in  Floor " + nc.getFromFloor());
 //                    getElevator(nc);
                 }
                 

@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import terminal.elevator.state.ElevatorState;
 import terminal.elevator.errors.*;
+import terminal.elevator.state.PersonState;
 import terminal.elevator.threads.messages.CallElevator;
 import terminal.elevator.threads.messages.OrderElevator;
 
@@ -18,16 +19,16 @@ import terminal.elevator.threads.messages.OrderElevator;
  * @author User
  */
 public class Elevator extends Thread {
+    protected int floorMirror;
+    protected final int ID;
+    protected ElevatorState es;
+
+    private int floor;
     private static int count = 0;
-    
-    private final int ID;
     private final int MAXWEIGHT = 600;
     private final int GROUNDFLOOR = 0;
     private final int TOPFLOOR = 10;
-    
-    private int floor;
     private int currentWeight;
-    private ElevatorState es;
     private ArrayList<Person> onBoard;
     private ArrayList<CallElevator> calls;
     private ArrayList<OrderElevator> orders;
@@ -36,6 +37,7 @@ public class Elevator extends Thread {
         count ++;
         ID = count;
         floor = 0;
+        floorMirror = floor;
         currentWeight = 0;
         es = ElevatorState.IDLE;
         onBoard = new ArrayList<>();
@@ -118,7 +120,8 @@ public class Elevator extends Thread {
         //Add Order
         orders.add(new OrderElevator(p));
         
-        p.getOn(this);
+        p.e = this;
+        p.ps = PersonState.ONELEVATOR;
         currentWeight += p.totalWeight();
         onBoard.add(p);
     }
@@ -126,7 +129,8 @@ public class Elevator extends Thread {
     public void getOut(Person p){
         currentWeight -= p.totalWeight();
         
-        p.getOut();
+        p.e = null;
+        p.ps = PersonState.FINISHED;
         if(onBoard.contains(p))
             onBoard.remove(p);
         
@@ -149,6 +153,7 @@ public class Elevator extends Thread {
         if(es == ElevatorState.UPWARDS){
             if(!isOnTopFloor()){
                 floor += 1;
+                floorMirror = floor;
                 sleep(100);
             } else {
                 es = ElevatorState.IDLE;
@@ -159,6 +164,7 @@ public class Elevator extends Thread {
         if(es == ElevatorState.DOWNWARDS){
             if(!isOnGroundFloor()){
                 floor -= 1;
+                floorMirror = floor;
                 sleep(100);
             } else {
                 es = ElevatorState.IDLE;
