@@ -6,15 +6,9 @@
 package terminal.elevator;
 
 import java.util.ArrayList;
-import java.util.NoSuchElementException;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-<<<<<<< HEAD
 import terminal.elevator.state.ElevatorManagerState;
-=======
 import terminal.elevator.state.ElevatorState;
->>>>>>> origin/master
 import terminal.elevator.threads.*;
 import terminal.elevator.threads.messages.CallElevator;
 
