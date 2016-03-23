@@ -131,6 +131,14 @@ public class Elevator extends Thread {
         removeOrders();
     }
     
+    public int getFloor () {
+        return floor;
+    }
+    
+    public ElevatorState getDirection () {
+        return es;
+    }
+    
     public void move() throws InterruptedException, OutOfBounds{
         if(!isInBounds())
             throw new OutOfBounds("Elevator out of terminal bounds");

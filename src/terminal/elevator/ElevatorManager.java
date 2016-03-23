@@ -10,6 +10,7 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import terminal.elevator.state.ElevatorState;
 import terminal.elevator.threads.*;
 import terminal.elevator.threads.messages.CallElevator;
 
@@ -80,7 +81,43 @@ public class ElevatorManager {
         }
     }
     
-    public int distance () {
-        return 0;
+    public int distance (Elevator e, CallElevator ce) {
+        int dist;
+        if (ce.getFromFloor() < e.getFloor()) {
+            if (e.getDirection() == ElevatorState.UPWARDS) {
+                if (ce.getDirection() == ElevatorState.UPWARDS) 
+                    dist = (10 - e.getFloor()) + 10 + ce.getFromFloor();
+                else
+                    dist = 2 * (10 - e.getFloor()) + (e.getFloor() - ce.getFromFloor());
+            } else {
+                if (ce.getDirection() == ElevatorState.UPWARDS) {
+                    dist = e.getFloor() + ce.getFromFloor();
+                } else {
+                    dist = e.getFloor() - ce.getFromFloor();
+                }
+            }
+        } else if (ce.getFromFloor() > e.getFloor()) {
+            if (e.getDirection() == ElevatorState.UPWARDS) {
+                if (ce.getDirection() == ElevatorState.UPWARDS) 
+                    dist = ce.getFromFloor() - e.getFloor();
+                else
+                    dist = (10 - e.getFloor()) + (10 - ce.getFromFloor());
+            } else {
+                if (ce.getDirection() == ElevatorState.UPWARDS) {
+                    dist = e.getFloor() + ce.getFromFloor();
+                } else {
+                    dist = e.getFloor() + 10 + (10 - ce.getFromFloor());
+                }
+            }
+        } else {
+            if (ce.getDirection() == e.getDirection()) {
+                dist = 0;
+            } else if (ce.getDirection() == ElevatorState.UPWARDS) {
+                dist = 2 * ce.getFromFloor();
+            } else {
+                dist = 2 * (10 - ce.getFromFloor());
+            }
+        }
+        return dist;
     }
 }
