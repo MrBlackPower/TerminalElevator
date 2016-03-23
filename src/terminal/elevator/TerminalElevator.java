@@ -5,6 +5,7 @@
  */
 package terminal.elevator;
 
+import terminal.elevator.threads.ElevatorManager;
 import static java.lang.Thread.sleep;
 import java.util.ArrayList;
 import terminal.elevator.state.ElevatorManagerState;

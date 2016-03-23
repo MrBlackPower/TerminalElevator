@@ -3,13 +3,15 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/bruno/git/TerminalElevator/src/terminal/elevator/state/PersonState.java</file>
-            <file>file:/home/bruno/git/TerminalElevator/src/terminal/elevator/state/CallState.java</file>
-            <file>file:/home/bruno/git/TerminalElevator/src/terminal/elevator/threads/Elevator.java</file>
-            <file>file:/home/bruno/git/TerminalElevator/src/terminal/elevator/errors/WrongDirection.java</file>
-            <file>file:/home/bruno/git/TerminalElevator/src/terminal/elevator/ElevatorManager.java</file>
-            <file>file:/home/bruno/git/TerminalElevator/src/terminal/elevator/state/ElevatorState.java</file>
-            <file>file:/home/bruno/git/TerminalElevator/src/terminal/elevator/TerminalElevator.java</file>
+            <file>file:/C:/Users/User/Documents/NetBeansProjects/TerminalElevator/src/terminal/elevator/threads/Person.java</file>
+            <file>file:/C:/Users/User/Documents/NetBeansProjects/TerminalElevator/src/terminal/elevator/state/PersonState.java</file>
+            <file>file:/C:/Users/User/Documents/NetBeansProjects/TerminalElevator/src/terminal/elevator/state/ElevatorManagerState.java</file>
+            <file>file:/C:/Users/User/Documents/NetBeansProjects/TerminalElevator/src/terminal/elevator/view/MainWindow.java</file>
+            <file>file:/C:/Users/User/Documents/NetBeansProjects/TerminalElevator/src/terminal/elevator/state/ElevatorState.java</file>
+            <file>file:/C:/Users/User/Documents/NetBeansProjects/TerminalElevator/src/terminal/elevator/ElevatorManager.java</file>
+            <file>file:/C:/Users/User/Documents/NetBeansProjects/TerminalElevator/src/terminal/elevator/helper/MathHelper.java</file>
+            <file>file:/C:/Users/User/Documents/NetBeansProjects/TerminalElevator/src/terminal/elevator/threads/Elevator.java</file>
+            <file>file:/C:/Users/User/Documents/NetBeansProjects/TerminalElevator/src/terminal/elevator/TerminalElevator.java</file>
         </group>
     </open-files>
 </project-private>
