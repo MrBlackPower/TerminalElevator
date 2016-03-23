@@ -24,7 +24,7 @@ public class TerminalElevator {
         // TODO code application logic here
         ElevatorManager em = new ElevatorManager(2, 1);
         em.start();
-        em.addPerson = 5;
-        em.ems = ElevatorManagerState.ADDINGPEOPLE;
+//        em.addPerson = 5;
+//        em.ems = ElevatorManagerState.ADDINGPEOPLE;
     }
 }

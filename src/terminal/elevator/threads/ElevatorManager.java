@@ -7,9 +7,12 @@ package terminal.elevator.threads;
 
 import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import terminal.elevator.state.ElevatorManagerState;
 import terminal.elevator.state.ElevatorState;
 import terminal.elevator.threads.*;
+import terminal.elevator.threads.messages.AssignedCall;
 import terminal.elevator.threads.messages.CallElevator;
 import terminal.elevator.threads.messages.FloorReply;
 import terminal.elevator.threads.messages.FloorRequest;
@@ -21,8 +24,8 @@ import terminal.elevator.threads.messages.FloorRequest;
 public class ElevatorManager extends Thread{
     private ArrayList<Elevator> elevators;
     private ArrayList<Person> persons;
-    private LinkedBlockingQueue<CallElevator> newCalls;
-    private ArrayList<CallElevator> calls;
+    private LinkedBlockingQueue<CallElevator> newCalls;//Calls people make
+    private LinkedBlockingQueue<AssignedCall> assignedCalls;
     public ElevatorManagerState ems;
     public int addPerson;
     
@@ -35,8 +38,8 @@ public class ElevatorManager extends Thread{
         ems = ElevatorManagerState.STARTING;
         elevators = new ArrayList<>();
         persons   = new ArrayList<>();
-        this.newCalls  = new LinkedBlockingQueue<>();
-        this.calls     = new ArrayList<>();
+        newCalls  = new LinkedBlockingQueue<>();
+        assignedCalls = new LinkedBlockingQueue<>();
         
         //creates new persons
         for(int i = 0; i < personsQnt; i++){
@@ -46,7 +49,7 @@ public class ElevatorManager extends Thread{
         
         //creates new elevators
         for(int i = 0; i < elevatorsQnt; i++){
-            Elevator e = new Elevator();
+            Elevator e = new Elevator(assignedCalls);
             elevators.add(e);
         }
     }
@@ -77,6 +80,9 @@ public class ElevatorManager extends Thread{
             for (Person p : persons)  {
                 p.start();
             }
+            for (Elevator e: elevators){
+                e.start();
+            }
             while(ems != ElevatorManagerState.DEAD){
                 //Verify if it has to add people in it
                 if(ems == ems.ADDINGPEOPLE){
@@ -94,7 +100,17 @@ public class ElevatorManager extends Thread{
                     //Atributes a elevator to it
                     CallElevator nc = newCalls.poll();
                     System.out.println("Call in  Floor " + nc.getFromFloor());
-//                    getElevator(nc);
+                    
+                    Elevator e = getElevator(nc);
+                    System.out.println("Elevator " + e.ID + " assigned.");
+                    
+                    AssignedCall ac = new AssignedCall(nc, e);
+                    try {
+                        assignedCalls.put(ac);
+                    } catch (InterruptedException ex) {
+                        System.out.println(ex.getMessage());
+                    }
+                    
                 }
                 
                 //Verify if elevator is requesting some floor information
