@@ -11,6 +11,8 @@ import terminal.elevator.state.ElevatorManagerState;
 import terminal.elevator.state.ElevatorState;
 import terminal.elevator.threads.*;
 import terminal.elevator.threads.messages.CallElevator;
+import terminal.elevator.threads.messages.FloorReply;
+import terminal.elevator.threads.messages.FloorRequest;
 
 /**
  *
@@ -163,5 +165,9 @@ public class ElevatorManager extends Thread{
             }
         }
         return assignedElevator;
+    }
+    
+    private FloorReply resolveFloorRequest(FloorRequest fr){
+        throw new UnsupportedOperationException("ablidebob");
     }
 }
