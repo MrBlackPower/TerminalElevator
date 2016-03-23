@@ -117,30 +117,30 @@ public class ElevatorManager extends Thread{
     
     public int distance (Elevator e, CallElevator ce) {
         int dist;
-        if (ce.getFromFloor() < e.getFloor()) {
+        if (ce.getFromFloor() < e.floorMirror) {
             if (e.getDirection() == ElevatorState.UPWARDS) {
                 if (ce.getDirection() == ElevatorState.UPWARDS) 
-                    dist = (10 - e.getFloor()) + 10 + ce.getFromFloor();
+                    dist = (10 - e.floorMirror) + 10 + ce.getFromFloor();
                 else
-                    dist = 2 * (10 - e.getFloor()) + (e.getFloor() - ce.getFromFloor());
+                    dist = 2 * (10 - e.floorMirror) + (e.floorMirror - ce.getFromFloor());
             } else {
                 if (ce.getDirection() == ElevatorState.UPWARDS) {
-                    dist = e.getFloor() + ce.getFromFloor();
+                    dist = e.floorMirror + ce.getFromFloor();
                 } else {
-                    dist = e.getFloor() - ce.getFromFloor();
+                    dist = e.floorMirror - ce.getFromFloor();
                 }
             }
-        } else if (ce.getFromFloor() > e.getFloor()) {
+        } else if (ce.getFromFloor() > e.floorMirror) {
             if (e.getDirection() == ElevatorState.UPWARDS) {
                 if (ce.getDirection() == ElevatorState.UPWARDS) 
-                    dist = ce.getFromFloor() - e.getFloor();
+                    dist = ce.getFromFloor() - e.floorMirror;
                 else
-                    dist = (10 - e.getFloor()) + (10 - ce.getFromFloor());
+                    dist = (10 - e.floorMirror) + (10 - ce.getFromFloor());
             } else {
                 if (ce.getDirection() == ElevatorState.UPWARDS) {
-                    dist = e.getFloor() + ce.getFromFloor();
+                    dist = e.floorMirror + ce.getFromFloor();
                 } else {
-                    dist = e.getFloor() + 10 + (10 - ce.getFromFloor());
+                    dist = e.floorMirror + 10 + (10 - ce.getFromFloor());
                 }
             }
         } else {
