@@ -5,6 +5,8 @@
  */
 package terminal.elevator.view;
 
+import java.awt.Color;
+
 /**
  *
  * @author User
@@ -28,23 +30,135 @@ public class MainWindow extends javax.swing.JFrame {
     private void initComponents() {
 
         jSpinner2 = new javax.swing.JSpinner();
-        jSpinner1 = new javax.swing.JSpinner();
-        jInternalFrame1 = new javax.swing.JInternalFrame();
+        elevatorSlider = new javax.swing.JSlider();
+        personSlider = new javax.swing.JSlider();
+        elevatorsLabel = new javax.swing.JLabel();
+        personsLabel = new javax.swing.JLabel();
+        jProgressBar1 = new javax.swing.JProgressBar();
+        startButton = new javax.swing.JButton();
+        mainPanel = new java.awt.Panel();
+        buildButton = new javax.swing.JButton();
+        elevatorsQntLabel = new javax.swing.JLabel();
+        personQntLabel = new javax.swing.JLabel();
+        personsLabel1 = new javax.swing.JLabel();
+        personAddSlider = new javax.swing.JSlider();
+        personAddButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setBackground(new java.awt.Color(240, 251, 251));
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowActivated(java.awt.event.WindowEvent evt) {
+                formWindowActivated(evt);
+            }
+        });
 
-        jInternalFrame1.setVisible(true);
+        elevatorSlider.setMajorTickSpacing(5);
+        elevatorSlider.setMaximum(10);
+        elevatorSlider.setMinorTickSpacing(1);
+        elevatorSlider.setPaintLabels(true);
+        elevatorSlider.setPaintTicks(true);
+        elevatorSlider.setSnapToTicks(true);
+        elevatorSlider.setValue(1);
+        elevatorSlider.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                elevatorSliderMouseDragged(evt);
+            }
+        });
+        elevatorSlider.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                elevatorSliderMouseReleased(evt);
+            }
+        });
+        elevatorSlider.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                elevatorSliderPropertyChange(evt);
+            }
+        });
 
-        javax.swing.GroupLayout jInternalFrame1Layout = new javax.swing.GroupLayout(jInternalFrame1.getContentPane());
-        jInternalFrame1.getContentPane().setLayout(jInternalFrame1Layout);
-        jInternalFrame1Layout.setHorizontalGroup(
-            jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        personSlider.setMajorTickSpacing(25);
+        personSlider.setMinorTickSpacing(5);
+        personSlider.setPaintLabels(true);
+        personSlider.setPaintTicks(true);
+        personSlider.setSnapToTicks(true);
+        personSlider.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                personSliderMouseDragged(evt);
+            }
+        });
+        personSlider.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                personSliderMouseReleased(evt);
+            }
+        });
+        personSlider.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                personSliderPropertyChange(evt);
+            }
+        });
+
+        elevatorsLabel.setText("Elevators");
+
+        personsLabel.setText("Persons");
+
+        startButton.setText("Start");
+
+        mainPanel.addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentShown(java.awt.event.ComponentEvent evt) {
+                mainPanelComponentShown(evt);
+            }
+        });
+
+        javax.swing.GroupLayout mainPanelLayout = new javax.swing.GroupLayout(mainPanel);
+        mainPanel.setLayout(mainPanelLayout);
+        mainPanelLayout.setHorizontalGroup(
+            mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
         );
-        jInternalFrame1Layout.setVerticalGroup(
-            jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 28, Short.MAX_VALUE)
+        mainPanelLayout.setVerticalGroup(
+            mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
+
+        buildButton.setText("Build");
+        buildButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                buildButtonMouseReleased(evt);
+            }
+        });
+
+        elevatorsQntLabel.setText("Elevators");
+
+        personQntLabel.setText("Persons");
+
+        personsLabel1.setText("Persons");
+
+        personAddSlider.setMajorTickSpacing(25);
+        personAddSlider.setMinorTickSpacing(5);
+        personAddSlider.setPaintLabels(true);
+        personAddSlider.setPaintTicks(true);
+        personAddSlider.setSnapToTicks(true);
+        personAddSlider.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                personAddSliderMouseDragged(evt);
+            }
+        });
+        personAddSlider.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                personAddSliderMouseReleased(evt);
+            }
+        });
+        personAddSlider.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                personAddSliderPropertyChange(evt);
+            }
+        });
+
+        personAddButton.setText("Add");
+        personAddButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                personAddButtonMouseReleased(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -52,21 +166,136 @@ public class MainWindow extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(340, Short.MAX_VALUE))
-            .addComponent(jInternalFrame1)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jProgressBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(10, 10, 10)
+                                .addComponent(elevatorsQntLabel)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(personQntLabel)
+                                .addGap(49, 49, 49))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(buildButton)
+                                    .addComponent(elevatorsLabel)
+                                    .addComponent(elevatorSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(personsLabel)
+                                    .addComponent(personSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(personsLabel1)
+                                    .addComponent(personAddSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(personAddButton))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 313, Short.MAX_VALUE)
+                                .addComponent(startButton)))))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jInternalFrame1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(211, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(startButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(elevatorsLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(elevatorSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(personsLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(personSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(elevatorsQntLabel)
+                            .addComponent(personQntLabel))
+                        .addGap(21, 21, 21)
+                        .addComponent(buildButton)
+                        .addGap(18, 18, 18)
+                        .addComponent(personsLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(personAddSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(personAddButton)
+                        .addGap(0, 23, Short.MAX_VALUE)))
+                .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
+
+        elevatorsLabel.getAccessibleContext().setAccessibleDescription("");
+        startButton.getAccessibleContext().setAccessibleName("Start");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void elevatorSliderPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_elevatorSliderPropertyChange
+        // TODO add your handling code here:
+        refreshElevators();
+    }//GEN-LAST:event_elevatorSliderPropertyChange
+
+    private void elevatorSliderMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_elevatorSliderMouseDragged
+        // TODO add your handling code here:
+        refreshElevators();
+    }//GEN-LAST:event_elevatorSliderMouseDragged
+
+    private void elevatorSliderMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_elevatorSliderMouseReleased
+        // TODO add your handling code here:
+        refreshElevators();
+    }//GEN-LAST:event_elevatorSliderMouseReleased
+
+    private void personSliderMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_personSliderMouseDragged
+        // TODO add your handling code here:
+        refreshPersons();
+    }//GEN-LAST:event_personSliderMouseDragged
+
+    private void personSliderMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_personSliderMouseReleased
+        // TODO add your handling code here:
+        refreshPersons();
+    }//GEN-LAST:event_personSliderMouseReleased
+
+    private void personSliderPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_personSliderPropertyChange
+        // TODO add your handling code here:
+        refreshPersons();
+    }//GEN-LAST:event_personSliderPropertyChange
+
+    private void buildButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_buildButtonMouseReleased
+        // TODO add your handling code here:
+        mainPanel.setBackground(Color.WHITE);
+        
+    }//GEN-LAST:event_buildButtonMouseReleased
+
+    private void mainPanelComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_mainPanelComponentShown
+        // TODO add your handling code here:
+        mainPanel.setBackground(Color.WHITE);
+    }//GEN-LAST:event_mainPanelComponentShown
+
+    private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
+        // TODO add your handling code here:
+        mainPanel.setBackground(Color.WHITE);
+    }//GEN-LAST:event_formWindowActivated
+
+    private void personAddSliderMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_personAddSliderMouseDragged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_personAddSliderMouseDragged
+
+    private void personAddSliderMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_personAddSliderMouseReleased
+        // TODO add your handling code here:
+    }//GEN-LAST:event_personAddSliderMouseReleased
+
+    private void personAddSliderPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_personAddSliderPropertyChange
+        // TODO add your handling code here:
+    }//GEN-LAST:event_personAddSliderPropertyChange
+
+    private void personAddButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_personAddButtonMouseReleased
+        // TODO add your handling code here:
+    }//GEN-LAST:event_personAddButtonMouseReleased
 
     /**
      * @param args the command line arguments
@@ -104,8 +333,26 @@ public class MainWindow extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JInternalFrame jInternalFrame1;
-    private javax.swing.JSpinner jSpinner1;
+    private javax.swing.JButton buildButton;
+    private javax.swing.JSlider elevatorSlider;
+    private javax.swing.JLabel elevatorsLabel;
+    private javax.swing.JLabel elevatorsQntLabel;
+    private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JSpinner jSpinner2;
+    private java.awt.Panel mainPanel;
+    private javax.swing.JButton personAddButton;
+    private javax.swing.JSlider personAddSlider;
+    private javax.swing.JLabel personQntLabel;
+    private javax.swing.JSlider personSlider;
+    private javax.swing.JLabel personsLabel;
+    private javax.swing.JLabel personsLabel1;
+    private javax.swing.JButton startButton;
     // End of variables declaration//GEN-END:variables
-}
+    
+    private void refreshElevators(){
+        elevatorsQntLabel.setText("Elevators: "+String.valueOf(elevatorSlider.getValue()));
+    }
+    
+    private void refreshPersons(){
+        personQntLabel.setText("Persons: "+String.valueOf(personSlider.getValue()));
+    }}

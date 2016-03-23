@@ -18,6 +18,8 @@ import terminal.elevator.threads.messages.OrderElevator;
  * @author User
  */
 public class Elevator extends Thread {
+    private static int count = 0;
+    
     private final int ID;
     private final int MAXWEIGHT = 600;
     private final int GROUNDFLOOR = 0;
@@ -30,8 +32,9 @@ public class Elevator extends Thread {
     private ArrayList<CallElevator> calls;
     private ArrayList<OrderElevator> orders;
     
-    public Elevator(int ID){
-        this.ID = ID;
+    public Elevator(){
+        count ++;
+        ID = count;
         floor = 0;
         currentWeight = 0;
         es = ElevatorState.IDLE;

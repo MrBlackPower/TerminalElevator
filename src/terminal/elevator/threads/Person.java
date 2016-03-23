@@ -18,6 +18,8 @@ import terminal.elevator.threads.messages.CallElevator;
  * @author User
  */
 public class Person extends Thread{
+    private static int count = 0;
+    
     private int toFloor;
     private int floor;
     private float trolleyWeight; 
@@ -44,11 +46,12 @@ public class Person extends Thread{
      * Person Constructor 
      * @param id
      */
-    public Person(int id, LinkedBlockingQueue<CallElevator> line){
-        int trolleyQnt = MathHelper.randBetween(MAXTROLLEY,ZERO);
+    public Person(LinkedBlockingQueue<CallElevator> line){
+        count ++;
+        id = count;
         
+        int trolleyQnt = MathHelper.randBetween(MAXTROLLEY,ZERO);
         this.line = line;
-        this.id = id;
         ps = PersonState.SLEEPING;
         fromFloor = MathHelper.randBetween(MAXFLOOR,ZERO);
         floor = fromFloor;
@@ -74,15 +77,11 @@ public class Person extends Thread{
             Logger.getLogger(Person.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        System.out.println("Thread " + id + " awoke after " + idleTime + "ms");
+        System.out.println("Thread " + id + " awoke after " + idleTime + "ms in floor " + fromFloor);
         
         
         callElevator();
-        
-
-        while(!(ps == PersonState.FINISHED)){
-            
-        }
+        System.out.println("Thread " + id + " finished.");
     }
     
     public void getOn(Elevator e){

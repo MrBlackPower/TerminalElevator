@@ -10,6 +10,7 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import terminal.elevator.state.ElevatorManagerState;
 import terminal.elevator.threads.*;
 import terminal.elevator.threads.messages.CallElevator;
 
@@ -17,70 +18,110 @@ import terminal.elevator.threads.messages.CallElevator;
  *
  * @author User
  */
-public class ElevatorManager {
-    public ArrayList<Elevator> elevators;
-    public ArrayList<Person> persons;
-    public LinkedBlockingQueue<CallElevator> newCalls;
-    public ArrayList<CallElevator> calls;
+public class ElevatorManager extends Thread{
+    private ArrayList<Elevator> elevators;
+    private ArrayList<Person> persons;
+    private LinkedBlockingQueue<CallElevator> newCalls;
+    private ArrayList<CallElevator> calls;
+    public ElevatorManagerState ems;
+    public int addPerson;
     
     /**
      * 
-     * @param persons
-     * @param elevators 
+     * @param personsQnt
+     * @param elevatorsQnt
      */
-    public ElevatorManager(ArrayList<Person> persons, ArrayList<Elevator> elevators){
-        this.elevators = elevators;
-        this.persons   = persons;
-        this.newCalls  = new LinkedBlockingQueue();
-        this.calls     = new ArrayList();
+    public ElevatorManager(int personsQnt, int elevatorsQnt){
+        ems = ElevatorManagerState.STARTING;
+        elevators = new ArrayList<>();
+        persons   = new ArrayList<>();
+        this.newCalls  = new LinkedBlockingQueue<>();
+        this.calls     = new ArrayList<>();
+        
+        //creates new persons
+        for(int i = 0; i < personsQnt; i++){
+            Person p = new Person(newCalls);
+            persons.add(p);
+        }
+        
+        //creates new elevators
+        for(int i = 0; i < elevatorsQnt; i++){
+            Elevator e = new Elevator();
+            elevators.add(e);
+        }
     }
     
-    public ElevatorManager (ArrayList<Elevator> elevators) {
-        this.elevators = elevators;
-        this.persons   = new ArrayList();
-        this.newCalls  = new LinkedBlockingQueue();
-        this.calls     = new ArrayList();
-    }
     
     /**
      * When called with no arguments, the default behavior is to consider
      * a single elevator system.
      */
     public ElevatorManager () {
-        this.elevators = new ArrayList();
-        elevators.add(new Elevator(1));
-        this.persons  = new ArrayList();
-        this.newCalls = new LinkedBlockingQueue();
-        this.calls    = new ArrayList();
+        this(20,1);
     }
     
-    public void addPerson (Person p) {
-        this.persons.add(p);
+    public void addPerson (int qnt) {
+        addPerson = qnt;
     }
     
     public void addPerson (ArrayList<Person> p) {
         this.persons.addAll(p);
+        
+        for(Person pe : p){
+            pe.start();
+        }
     }
     
-    public void start() {
-        if (!this.persons.isEmpty()) {
-            for (Person p : this.persons)  {
+    public void run() {
+        if (!persons.isEmpty()) {
+            for (Person p : persons)  {
                 p.start();
             }
-            while (!this.persons.get(0).getCallList().isEmpty()) {
-                try {
-                    this.newCalls.add(this.persons.get(0).getCallList().take());
-                } catch (NoSuchElementException ex) {
-                    System.out.println(ex.toString());
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(ElevatorManager.class.getName()).log(Level.SEVERE, null, ex);
+            while(ems != ElevatorManagerState.DEAD){
+                //Verify if it has to add people in it
+                if(ems == ems.ADDINGPEOPLE){
+                    for(int i = 0; i < addPerson; i++){
+                        Person p = new Person(newCalls);
+                        p.start();
+                    }
+                    
+                    addPerson = 0;
+                    ems = ElevatorManagerState.RUNNING;
+                }
+                    
+                //Verify is someone ordered a elevator
+                while(!newCalls.isEmpty()){
+                    //Atributes a elevator to it
+                    CallElevator nc = newCalls.poll();
+                    System.out.println("Call in  Floor" + nc.getFromFloor());
+//                    getElevator(nc);
                 }
                 
+                //Verify if elevator is requesting some floor information
+                
+                //Sends floor information
+                
             }
+
+//            while (!this.persons.get(0).getCallList().isEmpty()) {
+//                try {
+//                    this.newCalls.add(this.persons.get(0).getCallList().take());
+//                } catch (NoSuchElementException ex) {
+//                    System.out.println(ex.toString());
+//                } catch (InterruptedException ex) {
+//                    Logger.getLogger(ElevatorManager.class.getName()).log(Level.SEVERE, null, ex);
+//                }
+//                
+//            }
         }
+        System.out.println("Manager Finished");
     }
     
     public int distance () {
         return 0;
+    }
+
+    private void getElevator(CallElevator ce) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
