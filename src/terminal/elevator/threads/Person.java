@@ -79,14 +79,12 @@ public class Person extends Thread{
         
         
         
-        System.out.println("Thread " + ID + " awoke after " + IDLETIME + "ms in floor " + FROMFLOOR);
+        System.out.println("Person " + getID() + " awoke after " + IDLETIME + "ms in floor " + FROMFLOOR);
         
         if(ps == PersonState.SLEEPING){
             callElevator();
             ps = PersonState.WAITING;
         }
-        
-        System.out.println("Thread " + ID + " finished.");
     }
 
     /**
@@ -187,7 +185,7 @@ public class Person extends Thread{
     
     public void checkCompletion() throws FalseStatement{
         if(floor != toFloor){
-            throw new FalseStatement("Person " + ID + " is not really finished.");
+            throw new FalseStatement("Person " + getID() + " is not really finished.");
         }
     }
     
@@ -199,5 +197,12 @@ public class Person extends Thread{
     public void getOff(){
         e = null;
         ps = PersonState.FINISHED;
+    }
+
+    /**
+     * @return the ID
+     */
+    public int getID() {
+        return ID;
     }
 }

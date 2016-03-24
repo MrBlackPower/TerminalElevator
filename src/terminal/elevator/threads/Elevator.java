@@ -13,6 +13,8 @@ import terminal.elevator.state.ElevatorState;
 import terminal.elevator.errors.*;
 import terminal.elevator.threads.messages.AssignedCall;
 import terminal.elevator.threads.messages.CallElevator;
+import terminal.elevator.threads.messages.FloorReply;
+import terminal.elevator.threads.messages.FloorRequest;
 import terminal.elevator.threads.messages.OrderElevator;
 
 /**
@@ -22,8 +24,9 @@ import terminal.elevator.threads.messages.OrderElevator;
 public class Elevator extends Thread {
     protected int floorMirror;
     protected final int ID;
-    protected ElevatorState es;
-
+    protected boolean dead;
+    
+    private ElevatorState es;
     private final int TICKTIME = 1000;
     private int floor;
     private static int count = 0;
@@ -35,8 +38,12 @@ public class Elevator extends Thread {
     private ArrayList<CallElevator> calls;
     private ArrayList<OrderElevator> orders;
     private LinkedBlockingQueue<AssignedCall> assignedCalls;
+    private LinkedBlockingQueue<FloorRequest> floorRequests;
+    private LinkedBlockingQueue<FloorReply> floorReplies;
     
-    public Elevator(LinkedBlockingQueue<AssignedCall> assignedCalls){
+    public Elevator(LinkedBlockingQueue<AssignedCall> assignedCalls,
+            LinkedBlockingQueue<FloorRequest> floorRequests,
+            LinkedBlockingQueue<FloorReply> floorReplies){
         count ++;
         ID = count;
         floor = 0;
@@ -47,12 +54,15 @@ public class Elevator extends Thread {
         calls = new ArrayList<>();
         orders = new ArrayList<>();
         this.assignedCalls = assignedCalls;
+        this.floorReplies = floorReplies;
+        this.floorRequests = floorRequests;
+        dead = false;
     }
     
     @Override
     public void run(){
-        while(es != ElevatorState.DEAD){
-            verifyCalls();
+        while(!dead){
+            checkCalls();
             try {
                 if(null != es)
                     switch (es) {
@@ -72,19 +82,46 @@ public class Elevator extends Thread {
                 Logger.getLogger(Elevator.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        es = ElevatorState.DEAD;
+        System.out.println("Elevator " + ID + " finished.");
     }
     
     public void checkFloor(){
-        //System.out.println("Unsupported method");
+        FloorRequest fRequest = new FloorRequest(this,floor);
+        ArrayList<Person> personsOnFloor = null;
+        
+        try {
+            floorRequests.put(fRequest);
+        } catch (InterruptedException ex) {
+            System.out.println(ex.getMessage());
+        }
+        
+        while (personsOnFloor == null) {            
+            if(!floorReplies.isEmpty()){
+                for(FloorReply fReply : floorReplies){
+                    Elevator e = fReply.getElevator();
+                    if(e.ID == ID){
+                        personsOnFloor = fReply.getPersons();
+                        if(!personsOnFloor.isEmpty()){
+                            String msg = "Elevator " + ID + " identified ";
+                            msg += personsOnFloor.size() + " persons on floor " + floor;
+                            System.out.println(msg);
+                        }
+                        
+                        floorReplies.remove(fReply);
+                    }
+                    
+                }
+            }
+        }
+        
+        checkFloorAux(personsOnFloor);
+        
     }
     
-    public void checkFloor(ArrayList<Person> persons){
+    public void checkFloorAux(ArrayList<Person> persons){
         //People Leaving
-        for(Person p : onBoard){
-            if(floor == p.getToFloor())
-                getOut(p);
-            
-        }
+        getOut();
         
         if (es != ElevatorState.IDLE) {
             //People going in and going in the same direction
@@ -93,7 +130,6 @@ public class Elevator extends Thread {
                     if (p.getDirection() == es) {
                         try {
                             getOn(p);
-                            persons.remove(p);
                         } catch (WrongDirection | ThreadStillAlive ex) {
                             System.out.println(ex.getMessage());
                         }
@@ -102,7 +138,7 @@ public class Elevator extends Thread {
             }
 
             //Checks if can change direction
-            boolean changeDirection = (es == ElevatorState.UPWARDS ? hasAboveActions() : hasBelowActions());
+            boolean changeDirection = (es == ElevatorState.UPWARDS ? !hasAboveActions() : !hasBelowActions());
 
             //People going in in the opposite direction get in if the elevator
             //is empty and it`s possible to change the direction
@@ -120,6 +156,16 @@ public class Elevator extends Thread {
                 }
             }
         } else {
+            //If elevator is idle the person just needs to be in the same floor
+            for (Person p : persons) {
+                if (p.getFloor() == floor) {
+                    try {
+                        getOn(p);
+                    } catch (WrongDirection | ThreadStillAlive ex) {
+                        System.out.println(ex.getMessage());
+                    }
+                }
+            }        
         }
     }
     
@@ -135,21 +181,33 @@ public class Elevator extends Thread {
         
         //Add Order
         orders.add(new OrderElevator(p));
+        System.out.println("New Order to floor " + p.getToFloor());
         
         if(p.isAlive())
             throw new ThreadStillAlive("Person still alive");
             
         p.getOn(this);
+        System.out.println("Person " + p.getID()+ " got in Elevator " + ID);
         currentWeight += p.totalWeight();
         onBoard.add(p);
     }
     
-    public void getOut(Person p){
-        currentWeight -= p.totalWeight();
+    public void getOut(){
+        ArrayList<Person> delete = new ArrayList<>();
         
-        p.getOff();
-        if(onBoard.contains(p))
-            onBoard.remove(p);
+        for(Person p : onBoard){
+            if(floor == p.getToFloor())
+                delete.add(p);
+        }
+        
+        for(Person p : delete){
+            currentWeight -= p.totalWeight();
+            p.getOff();
+            System.out.println("Person " + p.getID() + " got off.");
+        }
+        
+        
+        boolean chng = onBoard.removeAll(delete);
         
         //Remove Order
         removeOrders();
@@ -220,15 +278,9 @@ public class Elevator extends Thread {
     
     private void idle() throws InterruptedException, OutOfBounds{
         checkFloor();
-        if(isOnGroundFloor()){
-            checkFloor();
+        if(isOnGroundFloor())
             if(hasAboveActions())
                 es = ElevatorState.UPWARDS;
-        } else {
-            if(!hasActions()){
-                es = ElevatorState.DOWNWARDS;
-            }
-        }
     }
     
     private void upwards() throws OutOfBounds, InterruptedException{
@@ -266,10 +318,14 @@ public class Elevator extends Thread {
     }
     
     private void removeOrders(){
+        ArrayList<OrderElevator> delete = new ArrayList<>();
+        
         for(OrderElevator o : orders){
             if(o.getToFloor() == floor)
-                orders.remove(o);
+                delete.add(o);
         }
+        
+        orders.removeAll(delete);
     }
     
     private boolean hasOrders(){
@@ -293,8 +349,8 @@ public class Elevator extends Thread {
     }
     
     private void removeCalls(CallElevator c){
-        calls.remove(c);
         System.out.println("Call " + c.getId() + " Removed");
+        calls.remove(c);
     }
     
     private boolean hasCalls(){
@@ -329,20 +385,17 @@ public class Elevator extends Thread {
         return hasBelowCalls() || hasBelowOrders();
     }
     
-    public void verifyCalls(){
+    public void checkCalls(){
+        AssignedCall acc = null;
         if(!assignedCalls.isEmpty()){
-            int i = assignedCalls.size();
             for(AssignedCall ac : assignedCalls){
                 Elevator e = ac.getE();
                 if(e.ID == ID){
                     System.out.println("Elevator " + ID + " got call on floor " + ac.getCall().getFromFloor());
                     calls.add(ac.getCall());
+                    acc = ac;
                     assignedCalls.remove(ac);
-                    i--;
                 }
-            }
-            if(i != assignedCalls.size()){
-                
             }
         }
     }

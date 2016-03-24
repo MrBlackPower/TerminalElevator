@@ -6,10 +6,6 @@
 package terminal.elevator;
 
 import terminal.elevator.threads.ElevatorManager;
-import static java.lang.Thread.sleep;
-import java.util.ArrayList;
-import terminal.elevator.state.ElevatorManagerState;
-import terminal.elevator.threads.Person;
 
 /**
  *
@@ -22,8 +18,8 @@ public class TerminalElevator {
      */
     public static void main(String[] args) throws InterruptedException {
         // TODO code application logic here
-        ElevatorManager em = new ElevatorManager(2, 1);
-        em.start();
+//        ElevatorManager em = new ElevatorManager(2, 1);
+//        em.start();
 //        em.addPerson = 5;
 //        em.ems = ElevatorManagerState.ADDINGPEOPLE;
     }

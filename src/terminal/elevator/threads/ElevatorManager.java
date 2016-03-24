@@ -9,9 +9,10 @@ import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JProgressBar;
 import terminal.elevator.state.ElevatorManagerState;
 import terminal.elevator.state.ElevatorState;
-import terminal.elevator.threads.*;
+import terminal.elevator.state.PersonState;
 import terminal.elevator.threads.messages.AssignedCall;
 import terminal.elevator.threads.messages.CallElevator;
 import terminal.elevator.threads.messages.FloorReply;
@@ -25,21 +26,32 @@ public class ElevatorManager extends Thread{
     private ArrayList<Elevator> elevators;
     private ArrayList<Person> persons;
     private LinkedBlockingQueue<CallElevator> newCalls;//Calls people make
-    private LinkedBlockingQueue<AssignedCall> assignedCalls;
+    private LinkedBlockingQueue<AssignedCall> assignedCalls;//Calls assigned to a elevator
+    private LinkedBlockingQueue<FloorRequest> floorRequests;//Floor requests by elevators
+    private LinkedBlockingQueue<FloorReply> floorReplies;//Floor replies
+    private JProgressBar progressBar;
+    
     public ElevatorManagerState ems;
     public int addPerson;
+    public int personsQnt;
+    public int elevatorsQnt;
     
     /**
      * 
      * @param personsQnt
      * @param elevatorsQnt
      */
-    public ElevatorManager(int personsQnt, int elevatorsQnt){
+    public ElevatorManager(int personsQnt, int elevatorsQnt,JProgressBar progressBar){
         ems = ElevatorManagerState.STARTING;
         elevators = new ArrayList<>();
         persons   = new ArrayList<>();
         newCalls  = new LinkedBlockingQueue<>();
         assignedCalls = new LinkedBlockingQueue<>();
+        floorReplies = new LinkedBlockingQueue<>();
+        floorRequests = new LinkedBlockingQueue<>();
+        this.personsQnt = personsQnt;
+        this.elevatorsQnt = elevatorsQnt;
+        this.progressBar = progressBar;
         
         //creates new persons
         for(int i = 0; i < personsQnt; i++){
@@ -49,18 +61,9 @@ public class ElevatorManager extends Thread{
         
         //creates new elevators
         for(int i = 0; i < elevatorsQnt; i++){
-            Elevator e = new Elevator(assignedCalls);
+            Elevator e = new Elevator(assignedCalls,floorRequests,floorReplies);
             elevators.add(e);
         }
-    }
-    
-    
-    /**
-     * When called with no arguments, the default behavior is to consider
-     * a single elevator system.
-     */
-    public ElevatorManager () {
-        this(20,1);
     }
     
     public void addPerson (int qnt) {
@@ -114,22 +117,45 @@ public class ElevatorManager extends Thread{
                 }
                 
                 //Verify if elevator is requesting some floor information
+                while(!floorRequests.isEmpty()){
+                    //Sends floor information
+                    for(FloorRequest fRequest : floorRequests){
+                        Elevator e = fRequest.getElevator();
+                        int floor = fRequest.getFloor();
+                        ArrayList<Person> personsOnFloor = new ArrayList<>();
+                        //TODO
+                        for(Person p : persons){
+                            if(!p.isAlive()){
+                                if(p.getPs() == PersonState.WAITING && p.getFloor() == e.floorMirror){
+                                    personsOnFloor.add(p);
+                                }
+                            }
+                        }
+                        
+                        //Create Reply
+                        FloorReply fReply = new FloorReply(e, personsOnFloor);
+                        
+                        //Send Reply
+                        try {
+                            floorReplies.put(fReply);
+                        } catch (InterruptedException ex) {
+                            System.out.println(ex.getMessage());
+                        }
+                        
+                        floorRequests.remove(fRequest);
+                    }
+                }
                 
-                //Sends floor information
-                
+                personsQnt = persons.size();
+                elevatorsQnt = elevators.size();
+                progressBar.setValue(100*getFinishedPersons()/personsQnt);
             }
-
-//            while (!this.persons.get(0).getCallList().isEmpty()) {
-//                try {
-//                    this.newCalls.add(this.persons.get(0).getCallList().take());
-//                } catch (NoSuchElementException ex) {
-//                    System.out.println(ex.toString());
-//                } catch (InterruptedException ex) {
-//                    Logger.getLogger(ElevatorManager.class.getName()).log(Level.SEVERE, null, ex);
-//                }
-//                
-//            }
         }
+        
+        for(Elevator e : elevators){
+            e.dead = true;
+        }
+        
         System.out.println("Manager Finished");
     }
     
@@ -185,5 +211,15 @@ public class ElevatorManager extends Thread{
     
     private FloorReply resolveFloorRequest(FloorRequest fr){
         throw new UnsupportedOperationException("ablidebob");
+    }
+    
+    private int getFinishedPersons(){
+        int i = 0;
+        for(Person p : persons){
+            if(!p.isAlive())
+                if(p.getPs() == PersonState.FINISHED)
+                    i++;
+        }
+        return i;
     }
 }
