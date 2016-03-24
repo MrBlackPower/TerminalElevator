@@ -102,17 +102,14 @@ public class Elevator extends Thread {
                     Elevator e = fReply.getElevator();
                     if(e.ID == ID){
                         personsOnFloor = fReply.getPersons();
-                        if(!personsOnFloor.isEmpty()){
-                            String msg = "Elevator " + ID + " identified ";
-                            msg += personsOnFloor.size() + " persons on floor " + floor;
-                            System.out.println(msg);
-                        }
-                        
                         floorReplies.remove(fReply);
                     }
                     
                 }
             }
+            if(dead)
+                return;
+                
         }
         
         checkFloorAux(personsOnFloor);
@@ -181,7 +178,6 @@ public class Elevator extends Thread {
         
         //Add Order
         orders.add(new OrderElevator(p));
-        System.out.println("New Order to floor " + p.getToFloor());
         
         if(p.isAlive())
             throw new ThreadStillAlive("Person still alive");
@@ -349,7 +345,6 @@ public class Elevator extends Thread {
     }
     
     private void removeCalls(CallElevator c){
-        System.out.println("Call " + c.getId() + " Removed");
         calls.remove(c);
     }
     
@@ -391,7 +386,6 @@ public class Elevator extends Thread {
             for(AssignedCall ac : assignedCalls){
                 Elevator e = ac.getE();
                 if(e.ID == ID){
-                    System.out.println("Elevator " + ID + " got call on floor " + ac.getCall().getFromFloor());
                     calls.add(ac.getCall());
                     acc = ac;
                     assignedCalls.remove(ac);

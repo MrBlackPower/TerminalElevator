@@ -30,8 +30,8 @@ public class ElevatorManager extends Thread{
     private LinkedBlockingQueue<FloorRequest> floorRequests;//Floor requests by elevators
     private LinkedBlockingQueue<FloorReply> floorReplies;//Floor replies
     private JProgressBar progressBar;
+    private ElevatorManagerState ems;
     
-    public ElevatorManagerState ems;
     public int addPerson;
     public int personsQnt;
     public int elevatorsQnt;
@@ -87,16 +87,6 @@ public class ElevatorManager extends Thread{
                 e.start();
             }
             while(ems != ElevatorManagerState.DEAD){
-                //Verify if it has to add people in it
-                if(ems == ems.ADDINGPEOPLE){
-                    for(int i = 0; i < addPerson; i++){
-                        Person p = new Person(newCalls);
-                        p.start();
-                    }
-                    
-                    addPerson = 0;
-                    ems = ElevatorManagerState.RUNNING;
-                }
                     
                 //Verify is someone ordered a elevator
                 while(!newCalls.isEmpty()){
@@ -148,7 +138,11 @@ public class ElevatorManager extends Thread{
                 
                 personsQnt = persons.size();
                 elevatorsQnt = elevators.size();
-                progressBar.setValue(100*getFinishedPersons()/personsQnt);
+                int finished = getFinishedPersons();
+                progressBar.setValue(100*finished/personsQnt);
+                
+                if(personsQnt == finished)
+                    ems = ElevatorManagerState.DEAD;
             }
         }
         
