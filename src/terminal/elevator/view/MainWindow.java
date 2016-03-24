@@ -150,6 +150,11 @@ public class MainWindow extends javax.swing.JFrame {
 
         reportButton.setText("Report");
         reportButton.setEnabled(false);
+        reportButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                reportButtonMouseReleased(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -272,6 +277,11 @@ public class MainWindow extends javax.swing.JFrame {
             reportButton.setEnabled(false);
     }//GEN-LAST:event_progressBarStateChanged
 
+    private void reportButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_reportButtonMouseReleased
+        // TODO add your handling code here:
+        report();
+    }//GEN-LAST:event_reportButtonMouseReleased
+
     /**
      * @param args the command line arguments
      */
@@ -360,5 +370,10 @@ public class MainWindow extends javax.swing.JFrame {
         buildButton.setEnabled(false);
         personSlider.setEnabled(false);
         elevatorSlider.setEnabled(false);
+    }
+    
+    public void report(){
+        if(!em.isAlive())
+            em.doReport();
     }
 }

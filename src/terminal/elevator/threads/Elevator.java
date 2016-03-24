@@ -5,12 +5,14 @@
  */
 package terminal.elevator.threads;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import terminal.elevator.state.ElevatorState;
 import terminal.elevator.errors.*;
+import terminal.elevator.helper.FileHelper;
 import terminal.elevator.threads.messages.AssignedCall;
 import terminal.elevator.threads.messages.CallElevator;
 import terminal.elevator.threads.messages.FloorReply;
@@ -184,6 +186,8 @@ public class Elevator extends Thread {
             
         p.getOn(this);
         System.out.println("Person " + p.getID()+ " got in Elevator " + ID);
+        Instant now = Instant.now();
+        FileHelper.addText(String.format("Person " + p.getID()+ "(Thread " + p.getId() + ") got in Elevator " + ID + " at " + now.toString()));
         currentWeight += p.totalWeight();
         onBoard.add(p);
     }
@@ -200,6 +204,8 @@ public class Elevator extends Thread {
             currentWeight -= p.totalWeight();
             p.getOff();
             System.out.println("Person " + p.getID() + " got off.");
+            Instant now = Instant.now();
+            FileHelper.addText(String.format("Person " + p.getID()+ "(Thread " + p.getId() + ") got off at " + now.toString()));
         }
         
         
@@ -248,6 +254,8 @@ public class Elevator extends Thread {
         }
         
         String msg ="Elevator " + ID + " now in floor " + floor + " going " + direction;
+        Instant now = Instant.now();
+        FileHelper.addText(String.format("Elevator " + ID+ "(Thread " + this.getId() + ") now in floor " + floor + " going " + direction + " " + now.toString()));
         System.out.println(msg);
         for(Person p : onBoard){
             p.setFloor(floor);

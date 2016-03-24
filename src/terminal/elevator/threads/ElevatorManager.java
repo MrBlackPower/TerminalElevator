@@ -5,11 +5,13 @@
  */
 package terminal.elevator.threads;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JProgressBar;
+import terminal.elevator.helper.FileHelper;
 import terminal.elevator.state.ElevatorManagerState;
 import terminal.elevator.state.ElevatorState;
 import terminal.elevator.state.PersonState;
@@ -92,10 +94,11 @@ public class ElevatorManager extends Thread{
                 while(!newCalls.isEmpty()){
                     //Atributes a elevator to it
                     CallElevator nc = newCalls.poll();
-                    System.out.println("Call in  Floor " + nc.getFromFloor());
                     
                     Elevator e = getElevator(nc);
-                    System.out.println("Elevator " + e.ID + " assigned.");
+                    System.out.println("Elevator " + e.ID + "(Thread " + e.getId() + " ) assigned to call on floor " + nc.getFromFloor());
+                    Instant now = Instant.now();
+                    FileHelper.addText(String.format("Elevator " + e.ID + "(Thread " + e.getId() + " ) assigned to call on floor " + nc.getFromFloor() + " at " + now.toString()));
                     
                     AssignedCall ac = new AssignedCall(nc, e);
                     try {
@@ -203,10 +206,6 @@ public class ElevatorManager extends Thread{
         return assignedElevator;
     }
     
-    private FloorReply resolveFloorRequest(FloorRequest fr){
-        throw new UnsupportedOperationException("ablidebob");
-    }
-    
     private int getFinishedPersons(){
         int i = 0;
         for(Person p : persons){
@@ -215,5 +214,9 @@ public class ElevatorManager extends Thread{
                     i++;
         }
         return i;
+    }
+    
+    public void doReport(){
+        FileHelper.writeFile("output.dat");
     }
 }

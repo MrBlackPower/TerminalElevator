@@ -14,7 +14,7 @@ import java.util.ArrayList;
  * @author User
  */
 public abstract class FileHelper {
-    private static ArrayList<String> texts = new ArrayList();
+    private static ArrayList<String> texts = new ArrayList<>();
     
     public static boolean writeFile(String filePath)
     {

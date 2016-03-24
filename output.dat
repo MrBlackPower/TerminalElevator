@@ -1,0 +1,59 @@
+Person 5 (Thread 24) awoke at 2016-03-24T01:32:44.922Zms in floor 8
+Thread 5 finished.
+Elevator 1(Thread 25 ) assigned to call on floor 8 at 2016-03-24T01:32:44.936Z
+Elevator 1(Thread 25) now in floor 1 going UP2016-03-24T01:32:45.937Z
+Elevator 1(Thread 25) now in floor 2 going UP2016-03-24T01:32:46.937Z
+Person 2 (Thread 21) awoke at 2016-03-24T01:32:47.820Zms in floor 7
+Thread 2 finished.
+Elevator 1(Thread 25 ) assigned to call on floor 7 at 2016-03-24T01:32:47.820Z
+Elevator 1(Thread 25) now in floor 3 going UP2016-03-24T01:32:47.937Z
+Elevator 1(Thread 25) now in floor 4 going UP2016-03-24T01:32:48.937Z
+Elevator 1(Thread 25) now in floor 5 going UP2016-03-24T01:32:49.937Z
+Elevator 1(Thread 25) now in floor 6 going UP2016-03-24T01:32:50.937Z
+Elevator 1(Thread 25) now in floor 7 going UP2016-03-24T01:32:51.938Z
+Elevator 1(Thread 25) now in floor 8 going UP2016-03-24T01:32:52.938Z
+Person 5(Thread 24) got in Elevator 1 at 2016-03-24T01:32:52.938Z
+Person 1 (Thread 20) awoke at 2016-03-24T01:32:53.231Zms in floor 10
+Thread 1 finished.
+Elevator 1(Thread 25 ) assigned to call on floor 10 at 2016-03-24T01:32:53.231Z
+Elevator 1(Thread 25) now in floor 7 going DOWN2016-03-24T01:32:53.938Z
+Person 5(Thread 24) got off at 2016-03-24T01:32:53.938Z
+Person 2(Thread 21) got in Elevator 1 at 2016-03-24T01:32:53.938Z
+Elevator 1(Thread 25) now in floor 6 going DOWN2016-03-24T01:32:54.938Z
+Elevator 1(Thread 25) now in floor 5 going DOWN2016-03-24T01:32:55.938Z
+Elevator 1(Thread 25) now in floor 4 going DOWN2016-03-24T01:32:56.939Z
+Elevator 1(Thread 25) now in floor 3 going DOWN2016-03-24T01:32:57.939Z
+Person 2(Thread 21) got off at 2016-03-24T01:32:57.939Z
+Elevator 1(Thread 25) now in floor 4 going UP2016-03-24T01:32:58.939Z
+Person 4 (Thread 23) awoke at 2016-03-24T01:32:59.169Zms in floor 5
+Thread 4 finished.
+Elevator 1(Thread 25 ) assigned to call on floor 5 at 2016-03-24T01:32:59.169Z
+Elevator 1(Thread 25) now in floor 5 going UP2016-03-24T01:32:59.939Z
+Person 4(Thread 23) got in Elevator 1 at 2016-03-24T01:32:59.939Z
+Elevator 1(Thread 25) now in floor 6 going UP2016-03-24T01:33:00.939Z
+Person 3 (Thread 22) awoke at 2016-03-24T01:33:01.740Zms in floor 1
+Thread 3 finished.
+Elevator 1(Thread 25 ) assigned to call on floor 1 at 2016-03-24T01:33:01.740Z
+Elevator 1(Thread 25) now in floor 7 going UP2016-03-24T01:33:01.939Z
+Elevator 1(Thread 25) now in floor 8 going UP2016-03-24T01:33:02.939Z
+Elevator 1(Thread 25) now in floor 9 going UP2016-03-24T01:33:03.939Z
+Person 4(Thread 23) got off at 2016-03-24T01:33:03.939Z
+Elevator 1(Thread 25) now in floor 10 going UP2016-03-24T01:33:04.939Z
+Person 1(Thread 20) got in Elevator 1 at 2016-03-24T01:33:04.939Z
+Elevator 1(Thread 25) now in floor 9 going DOWN2016-03-24T01:33:05.939Z
+Elevator 1(Thread 25) now in floor 8 going DOWN2016-03-24T01:33:06.939Z
+Person 1(Thread 20) got off at 2016-03-24T01:33:06.939Z
+Elevator 1(Thread 25) now in floor 7 going DOWN2016-03-24T01:33:07.940Z
+Elevator 1(Thread 25) now in floor 6 going DOWN2016-03-24T01:33:08.940Z
+Elevator 1(Thread 25) now in floor 5 going DOWN2016-03-24T01:33:09.940Z
+Elevator 1(Thread 25) now in floor 4 going DOWN2016-03-24T01:33:10.941Z
+Elevator 1(Thread 25) now in floor 3 going DOWN2016-03-24T01:33:11.941Z
+Elevator 1(Thread 25) now in floor 2 going DOWN2016-03-24T01:33:12.941Z
+Elevator 1(Thread 25) now in floor 1 going DOWN2016-03-24T01:33:13.941Z
+Person 3(Thread 22) got in Elevator 1 at 2016-03-24T01:33:13.941Z
+Elevator 1(Thread 25) now in floor 2 going UP2016-03-24T01:33:14.941Z
+Elevator 1(Thread 25) now in floor 3 going UP2016-03-24T01:33:15.941Z
+Elevator 1(Thread 25) now in floor 4 going UP2016-03-24T01:33:16.941Z
+Elevator 1(Thread 25) now in floor 5 going UP2016-03-24T01:33:17.941Z
+Person 3(Thread 22) got off at 2016-03-24T01:33:17.941Z
+Elevator 1(Thread 25) now in floor 4 going DOWN2016-03-24T01:33:18.942Z

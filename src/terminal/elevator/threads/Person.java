@@ -82,17 +82,13 @@ public class Person extends Thread{
         
         WAKINGTIME = Instant.now();
         
-        System.out.println("Person " + getID() + " awoke after " + IDLETIME + "ms in floor " + FROMFLOOR);
-        System.out.println("Thread " + ID + " awoke after " + IDLETIME + "ms in floor " + FROMFLOOR);
-        FileHelper.addText(String.format("Thread " + ID + " awoke at " + WAKINGTIME.toString() + "ms in floor " + FROMFLOOR));
+        System.out.println("Person " + ID + " awoke after " + IDLETIME + "ms in floor " + FROMFLOOR);
+        FileHelper.addText(String.format("Person "+ ID +" (Thread " + getId() + ") in floor " + FROMFLOOR + " awoke at " + WAKINGTIME.toString() ));
         
         if(ps == PersonState.SLEEPING){
             callElevator();
             ps = PersonState.WAITING;
         }
-        
-        System.out.println("Thread " + ID + " finished.");
-        FileHelper.addText(String.format("Thread " + ID + " finished."));
     }
 
     /**
