@@ -14,13 +14,14 @@ import java.util.ArrayList;
  * @author User
  */
 public abstract class FileHelper {
-    private static ArrayList<String> texts;
+    private static ArrayList<String> texts = new ArrayList();
     
     public static boolean writeFile(String filePath)
     {
         try
         {
-            try (FileWriter writer = new FileWriter(filePath); BufferedWriter buffer = new BufferedWriter(writer);) // Try-with-resources
+            try (FileWriter writer = new FileWriter(filePath);
+                 BufferedWriter buffer = new BufferedWriter(writer);) // Try-with-resources
             {
                 
                 for(String t : texts)
@@ -37,7 +38,7 @@ public abstract class FileHelper {
         }
         catch(java.io.IOException ex)
         {
-            System.out.println(String.format("Não foi possível ler o arquivo. Mensagem: %s", ex.getMessage()));
+            System.out.println(String.format("It was not possible to read the file. Message: %s", ex.getMessage()));
         }
         
         return false;

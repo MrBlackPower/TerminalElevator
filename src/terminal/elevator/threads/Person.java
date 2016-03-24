@@ -8,7 +8,9 @@ package terminal.elevator.threads;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.time.Instant;
 import terminal.elevator.errors.FalseStatement;
+import terminal.elevator.helper.FileHelper;
 import terminal.elevator.state.PersonState;
 import terminal.elevator.helper.MathHelper;
 import terminal.elevator.state.ElevatorState;
@@ -33,6 +35,7 @@ public class Person extends Thread{
     private final float WEIGHT;
     private final int FROMFLOOR;
     private final int IDLETIME;
+    private Instant WAKINGTIME;
     private final float MAXWEIGHT = 140;
     private final float MINWEIGHT = 50;
     private final int MAXFLOOR = 10;
@@ -77,9 +80,10 @@ public class Person extends Thread{
             Logger.getLogger(Person.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        
+        WAKINGTIME = Instant.now();
         
         System.out.println("Thread " + ID + " awoke after " + IDLETIME + "ms in floor " + FROMFLOOR);
+        FileHelper.addText(String.format("Thread " + ID + " awoke at " + WAKINGTIME.toString() + "ms in floor " + FROMFLOOR));
         
         if(ps == PersonState.SLEEPING){
             callElevator();
@@ -87,6 +91,7 @@ public class Person extends Thread{
         }
         
         System.out.println("Thread " + ID + " finished.");
+        FileHelper.addText(String.format("Thread " + ID + " finished."));
     }
 
     /**
@@ -199,5 +204,12 @@ public class Person extends Thread{
     public void getOff(){
         e = null;
         ps = PersonState.FINISHED;
+    }
+
+    /**
+     * @return the WAKINGTIME
+     */
+    public Instant getWakingTime() {
+        return WAKINGTIME;
     }
 }
