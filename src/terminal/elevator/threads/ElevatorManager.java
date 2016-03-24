@@ -218,5 +218,6 @@ public class ElevatorManager extends Thread{
     
     public void doReport(){
         FileHelper.writeFile("output.dat");
+        FileHelper.clear();
     }
 }
